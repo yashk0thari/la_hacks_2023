@@ -1,5 +1,10 @@
 import nltk
 import re
+import ssl
+
+# Temporary Fix for whisper run-time:
+ssl._create_default_https_context = ssl._create_unverified_context
+
 nltk.download('punkt')
 
 def data_preprocess(word_chunks: str):

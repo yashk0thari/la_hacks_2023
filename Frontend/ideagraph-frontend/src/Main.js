@@ -79,10 +79,7 @@ function Main() {
       graph.setEdge(edge.source, edge.target);
     });
 
-    dagre.layout(graph, {
-      nodeSep: 32,
-      rankSep: 32,
-    });
+    dagre.layout(graph);
 
     const newNodes = nodes.map((node) => ({
       ...node,

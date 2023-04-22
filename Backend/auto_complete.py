@@ -21,6 +21,6 @@ def query_complete(payload, query):
 # co = cohere.Client('1g4kF4R2RpuNTB3ehW1tRWW4QMh3pbF8zgdJGSl8')
 
 # response = co.generate(
-#   prompt="Exand on this thought: We could create an app that provides resources and tools for people to manage their stress and anxiety levels.",
+#   prompt="Give me a summary (in less than 3 words): We could create an app that provides resources and tools for people to manage their stress and anxiety levels.",
 # )
 # print(":: ", response)

@@ -4,8 +4,9 @@ from pre_process import data_preprocess
 from structure import Graph, Node
 
 #import Relevant libraries
-from flask import Flask, request, make_response, redirect
+from flask import Flask, request, make_response, redirect, url_for
 from fastapi import FastAPI, HTTPException
+import requests
 import os
 
 graph = Graph()
@@ -21,12 +22,19 @@ def home():
 
 @app.route("/user_input", methods = ['POST'])
 def process_user_input():
-    
+    if request.method == "POST":
+        user_text = request.json['text']
 
+        # Generate the URL for the target endpoint
+        response = requests.get(f"http://164.67.168.224:8080/graph_object/{user_text}")
 
-@app.route("/graph_object", methods = ['GET'])
-def process_graph_object(text: str):
-    text_senteces = data_preprocess(text)
+        # # Make an HTTP request to the target endpoint
+        # response = requests.get(endpoint2_url)
+    return response.content
+
+@app.route("/graph_object/<string:text>", methods = ['GET'])
+def process_graph_object(text):
+    text_sentences = data_preprocess(text)
     for sentence in text_sentences:
         if (sentence == ""):
             raise HTTPException(status_code=404, detail="Sentence cannot be null.")
