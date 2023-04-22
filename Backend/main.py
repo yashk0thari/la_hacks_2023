@@ -1,7 +1,14 @@
-from flask import Flask, request, make_response, redirect
-import model
-import os
+#import functions/classes
+from model import create_new_node
 from pre_process import data_preprocess
+from structure import Graph, Node
+
+#import Relevant libraries
+from flask import Flask, request, make_response, redirect
+from fastapi import FastAPI, HTTPException
+import os
+
+graph = Graph()
 
 # Define App:
 app = Flask(__name__)
@@ -11,6 +18,20 @@ app = Flask(__name__)
 @app.route('/')
 def home():
     return "HOME"
+
+@app.route("/user_input", methods = ['POST'])
+def process_user_input():
+    
+
+
+@app.route("/graph_object", methods = ['GET'])
+def process_graph_object(text: str):
+    text_senteces = data_preprocess(text)
+    for sentence in text_sentences:
+        if (sentence == ""):
+            raise HTTPException(status_code=404, detail="Sentence cannot be null.")
+        create_new_node(sentence, graph)
+    return graph.to_json()
 
 @app.route('/post/initial_file', methods = ['POST'])
 def init_file():
