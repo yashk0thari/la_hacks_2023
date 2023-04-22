@@ -5,14 +5,18 @@ from structure import Graph, Node
 
 #import Relevant libraries
 from flask import Flask, request, make_response, redirect, url_for
+from flask_cors import CORS
 from fastapi import FastAPI, HTTPException
 import requests
 import os
+
+
 
 graph = Graph()
 
 # Define App:
 app = Flask(__name__)
+CORS(app, origins=['http://localhost:3000'])
 
 ### Define Routes:
 # Home-Page API:
@@ -27,7 +31,7 @@ def process_user_input():
 
 
         # Generate the URL for the target endpoint
-        response = requests.get(f"http://164.67.168.224:8080/graph_object/{user_text}")
+        response = requests.get(f"http://127.0.0.1/graph_object/{user_text}")
 
         # # Make an HTTP request to the target endpoint
         # response = requests.get(endpoint2_url)

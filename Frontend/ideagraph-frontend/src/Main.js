@@ -13,6 +13,7 @@ import "reactflow/dist/style.css";
 import { Drawer } from "@mui/material";
 import dagre from "dagre";
 import { useNavigate } from "react-router";
+import axios from "axios";
 
 const styles = {
   mainDiv: { position: "relative", height: "100vh" },
@@ -59,6 +60,21 @@ function Main() {
     console.log("Node clicked:", element.id);
     setSelectedNode(element.id);
     setDrawerOpen(true);
+    // post request testing
+    console.log("making post request");
+    const dummyData = {
+      text: "UCLA is a great public university.",
+      // text : "John",
+    };
+    const url = "http://127.0.0.1:8080/user_input";
+    axios
+      .post(url, dummyData)
+      .then((response) => {
+        console.log(response.data);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
 
   useEffect(() => {
@@ -74,8 +90,6 @@ function Main() {
   }, [selectedNode]);
 
   useEffect(() => {
-    console.log("localStorage getItem");
-    console.log(localStorage.getItem("loggedIn"));
     if (
       !localStorage.getItem("loggedIn") ||
       localStorage.getItem("loggedIn") === "false"
