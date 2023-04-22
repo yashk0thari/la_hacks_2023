@@ -1,6 +1,7 @@
 import { Typography } from "@mui/material";
 import "./LoginScreen.css";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const styles = {
   splitScreen: {
@@ -31,6 +32,7 @@ const styles = {
 };
 
 function LoginScreen() {
+  const navigate = useNavigate();
   function decodeJwtResponse(token) {
     var base64Url = token.split(".")[1];
     var base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
@@ -47,6 +49,8 @@ function LoginScreen() {
   }
   function handleCallbackResponse(response) {
     console.log(decodeJwtResponse(response.credential));
+    navigate("/app");
+    localStorage.setItem("loggedIn", true);
   }
 
   useEffect(() => {

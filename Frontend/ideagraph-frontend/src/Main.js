@@ -12,10 +12,16 @@ import {
 import "reactflow/dist/style.css";
 import { Drawer } from "@mui/material";
 import dagre from "dagre";
+import { useNavigate } from "react-router";
 
 const styles = {
   mainDiv: { position: "relative", height: "100vh" },
-  signOutButton: { position: "absolute", top: "10px", right: "10px" },
+  signOutButton: {
+    position: "absolute",
+    top: "10px",
+    right: "10px",
+    zIndex: "1",
+  },
   openToolbarButton: { position: "relative", top: "10px", right: "10px" },
   drawerDiv: { margin: "32px", width: "40vw" },
   sentenceDescription: { marginTop: "24px" },
@@ -37,8 +43,10 @@ const initialEdges = [
 ];
 
 function Main() {
+  const navigate = useNavigate();
   const [isDrawerOpen, setDrawerOpen] = useState(false);
   const [selectedNode, setSelectedNode] = useState(-1); // just have to make sure not to assign any node id -1
+  const [signOutAux, setSignOutAux] = useState(false);
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
@@ -64,6 +72,17 @@ function Main() {
       document.removeEventListener("click", handleClick);
     };
   }, [selectedNode]);
+
+  useEffect(() => {
+    console.log("localStorage getItem");
+    console.log(localStorage.getItem("loggedIn"));
+    if (
+      !localStorage.getItem("loggedIn") ||
+      localStorage.getItem("loggedIn") === "false"
+    ) {
+      navigate("/");
+    }
+  }, []);
 
   useEffect(() => {
     const graph = new dagre.graphlib.Graph();
@@ -92,7 +111,7 @@ function Main() {
     console.log(nodes);
     setNodes(newNodes);
     console.log(newNodes);
-  }, []); // empty because we want to allow the user to
+  }, []); // empty because we want to allow the user to move nodes around
 
   const layout = {
     name: "dagre",
@@ -125,10 +144,17 @@ function Main() {
           </Typography>
         </div>
       </Drawer>
-      <Button variant="outlined" style={styles.signOutButton}>
+      <Button
+        variant="outlined"
+        style={styles.signOutButton}
+        onClick={() => {
+          setSignOutAux(!signOutAux);
+          localStorage.setItem("loggedIn", false);
+          navigate("/");
+        }}
+      >
         Sign Out
       </Button>
-
       <ReactFlow
         nodes={nodes}
         edges={edges}
