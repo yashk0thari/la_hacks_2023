@@ -1,6 +1,7 @@
 from flask import Flask, request, make_response, redirect
 import model
 import os
+from pre_process import data_preprocess
 
 # Define App:
 app = Flask(__name__)
