@@ -25,6 +25,7 @@ def process_user_input():
     if request.method == "POST":
         user_text = request.json['text']
 
+
         # Generate the URL for the target endpoint
         response = requests.get(f"http://164.67.168.224:8080/graph_object/{user_text}")
 
