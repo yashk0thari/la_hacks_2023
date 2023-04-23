@@ -20,6 +20,7 @@ import { Drawer } from "@mui/material";
 import dagre from "dagre";
 import { useNavigate } from "react-router";
 import axios from "axios";
+import * as d3 from "d3";
 
 const styles = {
   mainDiv: {
@@ -82,8 +83,9 @@ function Main() {
     setDrawerOpen(true);
     // post request testing
     console.log("making post request");
-    const text = "The temperature in Tokyo is currently 25 degrees. Celsius with a relative humidity of 70%. The population of Iceland is approximately 364,000 people as of 2021. The Mona Lisa painting was created by Leonardo da Vinci in the 16th century and is currently housed in the Louvre Museum in Paris. The highest peak in the world, Mount Everest, stands at 8,848 meters above sea level. The chemical formula for water is H2O, which consists of two hydrogen atoms and one oxygen atom. The average lifespan of a housefly is only around 30 days. The speed of light is approximately 299,792,458 meters per second in a vacuum."
-    const text1 = "I love Tokyo! it's my favourite city in the world"
+    const text =
+      "The temperature in Tokyo is currently 25 degrees. Celsius with a relative humidity of 70%. The population of Iceland is approximately 364,000 people as of 2021. The Mona Lisa painting was created by Leonardo da Vinci in the 16th century and is currently housed in the Louvre Museum in Paris. The highest peak in the world, Mount Everest, stands at 8,848 meters above sea level. The chemical formula for water is H2O, which consists of two hydrogen atoms and one oxygen atom. The average lifespan of a housefly is only around 30 days. The speed of light is approximately 299,792,458 meters per second in a vacuum.";
+    const text1 = "I love Tokyo! it's my favourite city in the world";
     const dummyData = {
       text: "UCLA is an amazing university, I love UCLA!.",
       // text : "John",
@@ -100,6 +102,38 @@ function Main() {
         console.error(error);
       });
   };
+
+  useEffect(() => {
+    const dummyData = {
+      text: "UCLA is an amazing university, I love UCLA!.",
+      // text : "John",
+    };
+    const url = "http://localhost:8080/user_input";
+    axios
+      .post(url, dummyData)
+      .then((response) => {
+        console.log(response.data.nodes);
+        setNodes(response.data.nodes);
+        setEdges(response.data.edges);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, []);
+
+  const simulation = d3
+    .forceSimulation(nodes)
+    .force(
+      "link",
+      d3
+        .forceLink(edges)
+        .id(function (d) {
+          return d.name;
+        })
+        .distance(200)
+    )
+    .force("charge", d3.forceManyBody().strength(-400))
+    .force("center", d3.forceCenter(0, 0));
 
   useEffect(() => {
     const handleClick = (event) => {
@@ -212,6 +246,29 @@ function Main() {
         console.error("Error accessing microphone:", error);
       });
   }
+
+  useEffect(() => {
+    const handleTick = () => {
+      const newNodes = nodes.map((node, i) => {
+        const graphNode = nodes[i];
+        return {
+          ...node,
+          position: {
+            x: graphNode.x,
+            y: graphNode.y,
+          },
+        };
+      });
+
+      setNodes(newNodes);
+    };
+
+    simulation.on("tick", handleTick);
+
+    return () => {
+      simulation.on("tick", null); // Remove the event listener when the component is unmounted
+    };
+  }, [nodes, setNodes]);
 
   return (
     <div style={styles.mainDiv}>
