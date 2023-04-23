@@ -49,19 +49,11 @@ const styles = {
 };
 
 const initialNodes = [
-<<<<<<< HEAD
   // { id: "1", position: { x: 0, y: 0 }, data: { label: "1" } },
   // { id: "2", position: { x: 0, y: 0 }, data: { label: "2" } },
   // { id: "3", position: { x: 0, y: 0 }, data: { label: "3" } },
   // { id: "4", position: { x: 0, y: 0 }, data: { label: "4" } },
   // { id: "5", position: { x: 0, y: 0 }, data: { label: "5" } },
-=======
-  { id: "1", position: { x: 0, y: 0 }, data: { label: "1"} },
-  { id: "2", position: { x: 0, y: 0 }, data: { label: "2" } },
-  { id: "3", position: { x: 0, y: 0 }, data: { label: "3" } },
-  { id: "4", position: { x: 0, y: 0 }, data: { label: "4" } },
-  { id: "5", position: { x: 0, y: 0 }, data: { label: "5" } },
->>>>>>> bd94c10 (rebase conflicts)
 ];
 const initialEdges = [
   // { id: "e1-2", source: "1", target: "2" },
