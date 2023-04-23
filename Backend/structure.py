@@ -175,8 +175,12 @@ class Graph:
                 edges.append(edge)
         return edges
 
+    def get_nodes_with_keyword_payload(self):
+        return [{node.id: [node.keyword, node.payload]} for node in self.get_nodes_values()]
+
     def to_json(self):
         return {
             "nodes": [self.convert_node_format(node) for node in self.node_dict.values()],
+            "nodes_data": self.get_nodes_with_keyword_payload(),
             "edges": self.generate_edges()
         }

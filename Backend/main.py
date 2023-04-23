@@ -5,7 +5,7 @@ from structure import Graph, Node
 from auto_complete import auto_complete, query_complete
 
 #import Relevant libraries
-from flask import Flask, request, make_response, redirect, url_for, jsonify
+from flask import Flask, request, make_response, redirect, url_for, jsonify, flash
 from werkzeug.utils import secure_filename
 from flask_cors import CORS
 from whisp import run_whisper
@@ -17,6 +17,8 @@ graph = Graph()
 
 # Define App:
 app = Flask(__name__)
+CORS(app, origins=['http://localhost:3000'])
+
 _path = "/Users/arjunrajloomba/Desktop/la-hack1/la_hacks_2023/Backend/uploads/"
 app.config['UPLOAD_FOLDER'] = _path  # Choose the folder where you want to save the uploaded files.
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # Set the maximum allowed file size to 16 MB.
@@ -27,7 +29,6 @@ ALLOWED_EXTENSIONS = {'txt', 'wav'}
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-CORS(app, origins=['http://localhost:3000'])
 
 ### Define Routes:
 # Home-Page API:
@@ -119,14 +120,18 @@ def process_user_audio_input():
     '''
 
 #file input
-@app.route('/user_input/text/', methods = ['POST'])
+@app.route('/user_input/text/', methods = ['POST', 'GET'])
 def process_user_text_input():
+    print(request.method)
     if request.method == 'POST':
+        print(request.files)
         if 'fileName' not in request.files:
-            return jsonify({"error": "No file part"}), 400
+            flash('No file part')
+            return redirect(request.url)
         file = request.files['fileName']
         if file.filename == '':
-            return jsonify({"error": "No selected file"}), 400
+            flash('No selected file')
+            return redirect(request.url)
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
@@ -137,10 +142,12 @@ def process_user_text_input():
                         text += i + ". "
 
                     payload = {"text": text}
-                    requests.get(f"http://127.0.0.1:8080/graph_object_from_file/", params = payload)
-                
+            flash('File uploaded successfully.')
+            print(jsonify({"success": "File uploaded successfully 200."}))
 
-            return jsonify({"success": "File uploaded successfully."}), 200
+        response = requests.get(f"http://127.0.0.1:8080/graph_object_from_file/", params = payload)
+        return response.content
+
     return '''
     <!doctype html>
     <title>Upload File</title>
@@ -150,6 +157,37 @@ def process_user_text_input():
       <input type=submit value=Upload>
     </form>
     '''
+# @app.route('/user_input/text/', methods = ['POST'])
+# def process_user_text_input():
+#     if request.method == 'POST':
+#         if 'fileName' not in request.files:
+#             return jsonify({"error": "No file part"}), 400
+#         file = request.files['fileName']
+#         if file.filename == '':
+#             return jsonify({"error": "No selected file"}), 400
+#         if file and allowed_file(file.filename):
+#             filename = secure_filename(file.filename)
+#             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+#             if (".txt" in filename):
+#                 with open(_path + filename) as f:
+#                     text = ""
+#                     for i in f.readlines():
+#                         text += i + ". "
+
+#                     payload = {"text": text}
+#                     requests.get(f"http://127.0.0.1:8080/graph_object_from_file/", params = payload)
+                
+
+#             return jsonify({"success": "File uploaded successfully."}), 200
+#     return '''
+#     <!doctype html>
+#     <title>Upload File</title>
+#     <h1>Upload File</h1>
+#     <form method=post enctype=multipart/form-data>
+#       <input type=file name=file>
+#       <input type=submit value=Upload>
+#     </form>
+#     '''
 
 @app.route("/graph_object_from_file/", methods = ['GET'])
 def process_graph_object_from_file():

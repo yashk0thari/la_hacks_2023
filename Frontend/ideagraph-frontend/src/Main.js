@@ -65,6 +65,7 @@ const initialEdges = [
 
 function Main() {
   const navigate = useNavigate();
+  const [payload, setPayload] = useState(null) //payload is a sentence given based on the keyword
   const [isDrawerOpen, setDrawerOpen] = useState(false);
   const [selectedNode, setSelectedNode] = useState(-1); // just have to make sure not to assign any node id -1
   const [signOutAux, setSignOutAux] = useState(false);
@@ -215,28 +216,41 @@ function Main() {
 
   return (
     <div style={styles.mainDiv}>
-      <Drawer
-        open={isDrawerOpen}
-        ModalProps={{ BackdropProps: { invisible: true } }}
-        style={styles.drawer}
-      >
-        <div style={styles.drawerDiv}>
-          <Typography
-            fontWeight="bold"
-            style={styles.typoSpaced}
-            sx={{ fontSize: "1.75rem" }}
-          >
-            Short representation
-          </Typography>
+<Drawer
+  open={isDrawerOpen}
+  ModalProps={{ BackdropProps: { invisible: true } }}
+  style={styles.drawer}
+>
+  <div style={styles.drawerDiv}>
+    {selectedNode !== -1 ? (
+      <>
+        <Typography
+          fontWeight="bold"
+          style={styles.typoSpaced}
+          sx={{ fontSize: "1.75rem" }}
+        >
+          {nodes.find((node) => node.id === selectedNode).data.label}
+        </Typography>
+        {payload && (
           <Typography
             style={styles.sentenceDescription}
             sx={{ fontSize: "1rem" }}
           >
-            A single-sentence description of this node will appear here. The
-            sentence should be about this long.
+            {payload[selectedNode]}
           </Typography>
-        </div>
-      </Drawer>
+        )}
+      </>
+    ) : (
+      <Typography
+        style={styles.sentenceDescription}
+        sx={{ fontSize: "1rem" }}
+      >
+        A single-sentence description of this node will appear here. The
+        sentence should be about this long.
+      </Typography>
+    )}
+  </div>
+</Drawer>
       <Button
         variant="outlined"
         style={styles.signOutButton}
@@ -291,6 +305,55 @@ function Main() {
             }}
           >
             <img src="upload_temp.svg"></img>
+            <input
+              type="file"
+              name="fileName"
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                opacity: 0,
+                width: "100%",
+                height: "100%",
+                cursor: "pointer",
+              }}
+              onChange={(e) => {
+                const file = e.target.files[0];
+                const fileType = file.type;
+                const endpoint =
+                  fileType === "text/plain"
+                    ? "http://127.0.0.1:8080/user_input/text/"
+                    : fileType === "audio/wav"
+                    ? "http://127.0.0.1:8080/user_input/audio/"
+                    : null;
+                if (endpoint) {
+                  const formData = new FormData();
+                  formData.append("fileName", file);
+                  axios
+                    .post(endpoint, formData)
+                    .then((response) => {
+                      console.log(response)
+                      setNodes(response.data.nodes);
+                      setEdges(response.data.edges);
+
+                      //setting the payload object
+                      const payloadObj = response.data.nodes_data.reduce((acc, cur) => {
+                        const [key, value] = Object.entries(cur)[0];
+                        acc[key] = value;
+                        return acc;
+                      }, {});
+                      setPayload(payloadObj);                           
+                      // Do something with the response data
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                      // Handle the error
+                    });
+                } else {
+                  // Handle unsupported file types
+                }
+              }}
+            />
           </IconButton>
         </Grid>
       )}
