@@ -5,7 +5,7 @@ import {
   ListItemButton,
   Typography,
 } from "@mui/material";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Background,
   Controls,
@@ -20,10 +20,10 @@ import { Drawer } from "@mui/material";
 import dagre from "dagre";
 import { useNavigate } from "react-router";
 import axios from "axios";
-import nodeContainer from './nodeContainer.js';
-import './nodeContainer.css';
-import './drawer.css';
-import drawerImage from './abstract.png';
+import nodeContainer from "./nodeContainer.js";
+import "./nodeContainer.css";
+import "./drawer.css";
+import drawerImage from "./abstract.png";
 
 const nodeTypes = { nodeContainer: nodeContainer };
 
@@ -43,7 +43,7 @@ const styles = {
     top: "10px",
     left: "1220px",
     zIndex: "1",
-    margin:0
+    margin: 0,
   },
   recordAudioButton: {
     position: "absolute",
@@ -64,7 +64,7 @@ const styles = {
     borderRadius: "25px",
     textTransform: "capitalize",
     fontWeight: "bold",
-  }
+  },
 };
 
 const initialNodes = [
@@ -78,11 +78,14 @@ const initialEdges = [
 ];
 
 function Main() {
+  const mediaRecorderRef = useRef(null);
+
   const navigate = useNavigate();
-  const [payload, setPayload] = useState(null) //payload is a sentence given based on the keyword
+  const [payload, setPayload] = useState(null); //payload is a sentence given based on the keyword
   const [isDrawerOpen, setDrawerOpen] = useState(false);
   const [selectedNode, setSelectedNode] = useState(-1); // just have to make sure not to assign any node id -1
   const [signOutAux, setSignOutAux] = useState(false);
+  const [isRecording, setRecording] = useState(false);
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
@@ -98,8 +101,9 @@ function Main() {
     setDrawerOpen(true);
     // post request testing
     console.log("making post request");
-    const text = "The temperature in Tokyo is currently 25 degrees. Celsius with a relative humidity of 70%. The population of Iceland is approximately 364,000 people as of 2021. The Mona Lisa painting was created by Leonardo da Vinci in the 16th century and is currently housed in the Louvre Museum in Paris. The highest peak in the world, Mount Everest, stands at 8,848 meters above sea level. The chemical formula for water is H2O, which consists of two hydrogen atoms and one oxygen atom. The average lifespan of a housefly is only around 30 days. The speed of light is approximately 299,792,458 meters per second in a vacuum."
-    const text1 = "I love Tokyo! it's my favourite city in the world"
+    const text =
+      "The temperature in Tokyo is currently 25 degrees. Celsius with a relative humidity of 70%. The population of Iceland is approximately 364,000 people as of 2021. The Mona Lisa painting was created by Leonardo da Vinci in the 16th century and is currently housed in the Louvre Museum in Paris. The highest peak in the world, Mount Everest, stands at 8,848 meters above sea level. The chemical formula for water is H2O, which consists of two hydrogen atoms and one oxygen atom. The average lifespan of a housefly is only around 30 days. The speed of light is approximately 299,792,458 meters per second in a vacuum.";
+    const text1 = "I love Tokyo! it's my favourite city in the world";
     const dummyData = {
       text: "UCLA is an amazing university, I love UCLA!.",
       // text : "John",
@@ -117,40 +121,40 @@ function Main() {
       });
   };
 
-    //Action when an autocomplete request is made
+  //Action when an autocomplete request is made
   const sendAutocompleteRequest = () => {
     // Your axios POST request logic goes here
     const url = "http://localhost:8080/post/autocomplete"; // endpoint
     const data = {
-      id: selectedNode // The current node's id is passed
+      id: selectedNode, // The current node's id is passed
     };
 
     axios
-    .post(url, data)
-    .then((response) => {
-      // Handle the response, e.g., update the UI with the autocomplete results
-      console.log("Autocomplete response:", response.data.autocomplete_data);
-      console.log("Edges: ", response.data.graph_data.edges)
-      console.log("Nodes: ", response.data.graph_data.nodes)
+      .post(url, data)
+      .then((response) => {
+        // Handle the response, e.g., update the UI with the autocomplete results
+        console.log("Autocomplete response:", response.data.autocomplete_data);
+        console.log("Edges: ", response.data.graph_data.edges);
+        console.log("Nodes: ", response.data.graph_data.nodes);
 
-      setNodes(response.data.graph_data.nodes);
-      setEdges(response.data.graph_data.edges);
+        setNodes(response.data.graph_data.nodes);
+        setEdges(response.data.graph_data.edges);
 
-      //setting the payload object
-      const payloadObj = response.data.graph_data.nodes_data.reduce((acc, cur) => {
-        const [key, value] = Object.entries(cur)[0];
-        acc[key] = value;
-        return acc;
-      }, {});
-      setPayload(payloadObj);                           
-
-      
-    })
-    .catch((error) => {
-      // Handle the error
-      console.error("Autocomplete error:", error);
-    });
-
+        //setting the payload object
+        const payloadObj = response.data.graph_data.nodes_data.reduce(
+          (acc, cur) => {
+            const [key, value] = Object.entries(cur)[0];
+            acc[key] = value;
+            return acc;
+          },
+          {}
+        );
+        setPayload(payloadObj);
+      })
+      .catch((error) => {
+        // Handle the error
+        console.error("Autocomplete error:", error);
+      });
   };
 
   useEffect(() => {
@@ -220,122 +224,130 @@ function Main() {
     console.log("Selected file:", selectedFile);
   };
 
-  function recordAndSendAudio() {
-    // Access the user's microphone and start recording
+  let mediaRecorder = null;
+  let chunks = [];
+  const [audioBlob, setAudioBlob] = useState(null);
+
+  const startRecording = () => {
+    setRecording(true);
     navigator.mediaDevices
       .getUserMedia({ audio: true })
       .then((stream) => {
-        const mediaRecorder = new MediaRecorder(stream);
-        const chunks = [];
+        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorderRef.current = mediaRecorder;
+        console.log("mediaRecorder 1");
+        console.log(mediaRecorder);
+        mediaRecorder.start();
+        setRecording(true);
 
-        mediaRecorder.addEventListener("dataavailable", (event) => {
-          chunks.push(event.data);
+        mediaRecorder.addEventListener("dataavailable", (e) => {
+          chunks.push(e.data);
         });
 
         mediaRecorder.addEventListener("stop", () => {
-          const blob = new Blob(chunks, { type: "audio/wav" });
-
-          // Send the audio data in a POST request
-          const formData = new FormData();
-          formData.append("audio", blob);
-
-          fetch("/api/audio", {
-            method: "POST",
-            body: formData,
-          })
-            .then((response) => {
-              console.log("Audio uploaded successfully!");
-            })
-            .catch((error) => {
-              console.error("Error uploading audio:", error);
-            });
+          const audioBlob = new Blob(chunks, { type: "audio/wav" });
+          setAudioBlob(audioBlob);
+          chunks = [];
         });
-
-        // Record for 10 seconds
-        mediaRecorder.start(10000);
-
-        setTimeout(() => {
-          mediaRecorder.stop();
-        }, 10000);
       })
-      .catch((error) => {
-        console.error("Error accessing microphone:", error);
+      .catch((err) => {
+        console.error("Error recording audio: ", err);
       });
-  }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop();
+      setRecording(false);
+    }
+  };
+
+  const handleAudioUpload = () => {
+    console.log("attempt to upload");
+    if (audioBlob) {
+      const formData = new FormData();
+      formData.append(
+        "audio",
+        audioBlob,
+        "audio" + Date.now().toString() + ".wav"
+      );
+
+      fetch("http://127.0.0.1:8080/user_input/audio", {
+        method: "POST",
+        body: formData,
+      })
+        .then((response) => {
+          console.log("Audio uploaded successfully: ", response);
+        })
+        .catch((err) => {
+          console.error("Error uploading audio: ", err);
+        });
+    }
+  };
 
   return (
     <div style={styles.mainDiv}>
-    <Drawer
-      open={isDrawerOpen}
-      ModalProps={{ BackdropProps: { invisible: true } }}
-      style={styles.drawer}
+      <Drawer
+        open={isDrawerOpen}
+        ModalProps={{ BackdropProps: { invisible: true } }}
+        style={styles.drawer}
       >
+        <div class="mainDrawerBody">
+          {selectedNode !== -1 ? (
+            <>
+              <div class="importText">
+                <div class="textImportMain">
+                  <h1>
+                    {nodes.find((node) => node.id === selectedNode).data.label}
+                  </h1>
+                </div>
 
-    
-	<div class="mainDrawerBody">
-      {selectedNode !== -1 ? (
-       <>
-       		<div class="importText">
-							<div class="textImportMain">
-  								<h1>{nodes.find((node) => node.id === selectedNode).data.label}</h1>
-							</div>
+                <div class="buttonImportMain">
+                  <Button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      sendAutocompleteRequest();
+                    }}
+                  >
+                    Autocomplete
+                  </Button>
+                </div>
+              </div>
 
-							<div class="buttonImportMain">
-								<Button
-        						onClick={(e) => {
-          						e.stopPropagation();
-          						sendAutocompleteRequest();
-       				 		}}
-    						>
-        						Autocomplete
-      					</Button>
-							</div>
-					</div>
+              <div class="subText">
+                {payload && (
+                  <p class="subTextText">{payload[selectedNode][1]}</p>
+                )}
+                ;
+              </div>
 
-					<div class="subText">
-					{payload && (
-							<p class="subTextText">
-									{payload[selectedNode][1]}
-							</p>
+              <div class="buttonContainers">
+                <div class="buttonOne">
+                  <button> Text One </button>
+                </div>
 
-					)};
-					</div>
+                <div class="buttonTwo">
+                  <button> Text Two </button>
+                </div>
 
+                <div class="buttonThree">
+                  <button> Text Three </button>
+                </div>
 
-					<div class="buttonContainers">
-				
-				<div class="buttonOne">
-					<button> Text One </button>
-				</div>
-	
-				<div class="buttonTwo">
-					<button> Text Two </button>
-				</div>
-	
-					<div class="buttonThree">
-					<button> Text Three </button>
-					</div>
-	
-					<div class="buttonFour">
-					<button> Text Four </button>
-					</div>
-	
-	
-				</div>
-	
-				<div class="mainTextText"> 
-	
-					<p>{nodes.find((node) => node.id === "0").data.payload}</p>
-	
-	
-				</div>
-	
-				{/* <div class="imgContainerContainer"> */}
-					<img src={drawerImage}></img>
-				{/* </div> */}
+                <div class="buttonFour">
+                  <button> Text Four </button>
+                </div>
+              </div>
 
+              <div class="mainTextText">
+                <p>{nodes.find((node) => node.id === "0").data.payload}</p>
+              </div>
 
-          {/* <Typography
+              {/* <div class="imgContainerContainer"> */}
+              <img src={drawerImage}></img>
+              {/* </div> */}
+
+              {/* <Typography
             fontWeight="bold"
             style={styles.typoSpaced}
             sx={{ fontSize: "1.75rem" }}
@@ -350,17 +362,16 @@ function Main() {
               {payload[selectedNode]}
            </Typography>
           )} */}
-        </>
-      ) : (
-			
-      <Typography
-        style={styles.sentenceDescription}
-        sx={{ fontSize: "1rem" }}
-      >
-        A single-sentence description of this node will appear here. The
-        sentence should be about this long.
-      </Typography>
-      )}
+            </>
+          ) : (
+            <Typography
+              style={styles.sentenceDescription}
+              sx={{ fontSize: "1rem" }}
+            >
+              A single-sentence description of this node will appear here. The
+              sentence should be about this long.
+            </Typography>
+          )}
           {/* <Button
         variant="contained"
         color="primary"
@@ -374,11 +385,10 @@ function Main() {
       >
         Autocomplete
       </Button> */}
-    </div>
-</Drawer>
-    
-    
-    <Button
+        </div>
+      </Drawer>
+
+      <Button
         variant="outlined"
         style={styles.regenerateButton}
         onClick={() => {
@@ -387,12 +397,11 @@ function Main() {
             .get(url)
             .then((response) => {
               setNodes(initialNodes);
-              setEdges(initialEdges);         
-             })
+              setEdges(initialEdges);
+            })
             .catch((error) => {
               console.error(error);
             });
-      
         }}
       >
         Regenerate Graph
@@ -444,57 +453,16 @@ function Main() {
               transform: "scale(1)",
               zIndex: "1",
             }}
+            onClick={() => {
+              if (!isRecording) {
+                startRecording();
+              } else {
+                stopRecording();
+                handleAudioUpload();
+              }
+            }}
           >
-            <img src="mic_temp.svg"></img>
-            <input
-              type="file"
-              name="fileName"
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                opacity: 0,
-                width: "100%",
-                height: "100%",
-                cursor: "pointer",
-              }}
-              onChange={(e) => {
-                const file = e.target.files[0];
-                const fileType = file.type;
-                const endpoint =
-                  fileType === "text/plain"
-                    ? "http://127.0.0.1:8080/user_input/text/"
-                    : fileType === "audio/wav"
-                    ? "http://127.0.0.1:8080/user_input/audio/"
-                    : null;
-                if (endpoint) {
-                  const formData = new FormData();
-                  formData.append("fileName", file);
-                  axios
-                    .post(endpoint, formData)
-                    .then((response) => {
-                      console.log(response)
-                      setNodes(response.data.nodes);
-                      setEdges(response.data.edges);
-
-                      //setting the payload object
-                      const payloadObj = response.data.nodes_data.reduce((acc, cur) => {
-                        const [key, value] = Object.entries(cur)[0];
-                        acc[key] = value;
-                        return acc;
-                      }, {});
-                      setPayload(payloadObj);                           
-                      // Do something with the response data
-                    })
-                    .catch((error) => {
-                      console.error(error);
-                      // Handle the error
-                    });
-                } else {
-                  // Handle unsupported file types
-                }
-              }}
-            />
+            <img src={isRecording ? "mic_temp_red.svg" : "mic_temp.svg"}></img>{" "}
           </IconButton>
           <IconButton
             style={{
@@ -530,17 +498,20 @@ function Main() {
                   axios
                     .post(endpoint, formData)
                     .then((response) => {
-                      console.log(response)
+                      console.log(response);
                       setNodes(response.data.nodes);
                       setEdges(response.data.edges);
 
                       //setting the payload object
-                      const payloadObj = response.data.nodes_data.reduce((acc, cur) => {
-                        const [key, value] = Object.entries(cur)[0];
-                        acc[key] = value;
-                        return acc;
-                      }, {});
-                      setPayload(payloadObj);                           
+                      const payloadObj = response.data.nodes_data.reduce(
+                        (acc, cur) => {
+                          const [key, value] = Object.entries(cur)[0];
+                          acc[key] = value;
+                          return acc;
+                        },
+                        {}
+                      );
+                      setPayload(payloadObj);
                       // Do something with the response data
                     })
                     .catch((error) => {

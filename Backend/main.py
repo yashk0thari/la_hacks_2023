@@ -107,6 +107,7 @@ def process_user_audio_input():
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            print('attempt to save file')
             if (".wav" in filename or ".mp3" in filename):
                 text = run_whisper(_path + filename)
 
