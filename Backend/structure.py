@@ -30,6 +30,7 @@ class Node:
         self.embedding = embedding
         self.x_coord = x_coord
         self.y_coord = y_coord
+        self.autocompleted = False
 
     # Getters:
     def get_id(self):
@@ -62,6 +63,9 @@ class Node:
     def get_y_coord(self):
         return self.y_coord
     
+    def get_autocompleted(self):
+        return self.autocompleted
+    
     # Setters:
     def set_payload(self, payload):
         self.payload = payload
@@ -90,6 +94,9 @@ class Node:
     def set_y_coord(self, y_coord):
         self.y_coord = y_coord
     
+    def get_autocompleted(self, autocompleted):
+        self.autocompleted = autocompleted
+    
     # Helper methods:
     def add_parent(self, parent_node):
         self.parents.append(parent_node)
@@ -110,6 +117,9 @@ class Node:
     
     def is_root(self):
         return len(self.parents) == 0
+    
+    def make_autocomplete(self):
+        self.autocompleted = True
 
     # JSON converter:
     def to_dict(self):
@@ -187,7 +197,8 @@ class Graph:
                 edge = {
                     "id": edge_id,
                     "source": node_id,
-                    "target": str(child_id)
+                    "target": str(child_id),
+                    "animated": True
                 }
                 edges.append(edge)
         return edges

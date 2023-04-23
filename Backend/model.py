@@ -11,14 +11,15 @@ import os
 import cohere
 import string
 import openai
-
+from dotenv import load_dotenv
+load_dotenv()
 #define API Key and cohere client
-API_KEY = "1g4kF4R2RpuNTB3ehW1tRWW4QMh3pbF8zgdJGSl8"
-co = cohere.Client(API_KEY)
+# API_KEY = "jzTXmIbUCjmvuESOO1eFo9FMlA5zRFPe5XH1UUDY"
+co = cohere.Client(os.getenv('COHERE_API_KEY'))
 
 #define Open AI Key and Client
-OPENAI_API_KEY = "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"
-openai.api_key = OPENAI_API_KEY
+# OPENAI_API_KEY = "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"
+openai.api_key = os.getenv('OPENAI_API_KEY')
 
 #global_constants
 CONNECT_ROOT_TO_HEAD = 0.5
@@ -45,10 +46,8 @@ def calculate_similarity(node_a, node_b):
 
 def generate_keyword_from_sentence(sentence: str):
   prompt = """
-    Extract a descriptive keyword that gives the core idea of this sentence: \n\n\
-    Example Sentence: Black-on-black ware is a 20th- and 21st-century pottery tradition developed by the Puebloan Native American ceramic artists in Northern New Mexico.\n\
-    Example keyword: Puebloan Pottery\n\,
-    Sentence: 
+    Extract a descriptive keyword that gives the core idea of a sentence. Here is the sentence:
+  
     """ + sentence + ". Keyword: \n"
 #   response = co.generate(prompt, model = "xlarge", 
 #         max_tokens=10,
