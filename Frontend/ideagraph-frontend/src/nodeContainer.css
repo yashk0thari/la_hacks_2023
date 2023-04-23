@@ -1,0 +1,106 @@
+body{
+    margin: 0px;
+    padding:0px;
+    background-color: #f6f6f6;
+}
+
+.mainBody{
+
+width: 450px;
+height: 275px;
+/* UI Properties */
+background: #FFFFFF 0% 0% no-repeat padding-box;
+box-shadow: 0px 3px 6px #00000029;
+border-radius: 20px;
+opacity: 1;
+margin: 50px;
+}
+
+.container {
+    display: flex;
+align-items: center;
+
+   }
+
+.container>img{
+    margin-top: 30px;
+    margin-left: 30px;
+    margin-bottom: 0px;
+   }
+
+   .container>span{
+    margin-top: 20px;
+    margin-left: 10px;
+    margin-bottom: 0px;
+   }
+
+   .titleText{
+    width: 100px;
+    height: 10px;
+    /* UI Properties */
+    text-align: left;
+    font: normal normal bold 14px/16px SF Pro Display;
+    letter-spacing: 0px;
+    color: #000000;
+    opacity: 1;
+    margin-bottom: 0px;
+   }
+   
+   .mainPara{
+       margin-left: 50px;
+       margin-top: -20px;
+       width: 80%;
+        height: 39px;
+        /* UI Properties */
+        text-align: left;
+        font: normal normal normal 15px/10px Helvetica;
+        letter-spacing: 0px;
+        color: #898989;
+        opacity: 1;
+        line-height: 20px;
+
+   }
+
+   .mainLower{
+       display: flex;
+       margin-top: 50px;
+       margin-left: 50px;
+       
+   }
+
+   .categoryOne{
+    text-align: left;
+    font: normal normal normal 13px/6px Helvetica;
+    letter-spacing: 0px;
+    color: #000000;
+    text-transform: lowercase;
+    opacity: 1;
+       margin-right: 20px;
+       background-color: #DDF4F8;
+       width: 100px;
+       height: 40px;
+       text-align: center;
+       border-radius: 8px;
+       line-height: 12px;
+
+   }
+
+   .categoryTwo{
+    text-align: left;
+    font: normal normal normal 13px/6px Helvetica;
+    letter-spacing: 0px;
+    color: #000000;
+    text-transform: lowercase;
+    opacity: 1;
+       background-color: #E8FDEC;
+       width: 80px;
+       height: 40px;
+       text-align: center;
+       border-radius: 8px;
+       line-height: 12px;
+       
+   }
+
+   .imageCategory{
+       margin-left: 45px;
+   }
