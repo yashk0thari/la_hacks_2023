@@ -1,5 +1,7 @@
 import { Button, ListItemButton, Typography } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
+import { graph } from "./tree";
+
 import {
   Background,
   Controls,
@@ -28,20 +30,32 @@ const styles = {
   sentenceDescription: { marginTop: "24px" },
 };
 
-const initialNodes = [
-  { id: "1", position: { x: 0, y: 0 }, data: { label: "1" } },
-  { id: "2", position: { x: 0, y: 0 }, data: { label: "2" } },
-  { id: "3", position: { x: 0, y: 0 }, data: { label: "3" } },
-  { id: "4", position: { x: 0, y: 0 }, data: { label: "4" } },
-  { id: "5", position: { x: 0, y: 0 }, data: { label: "5" } },
-];
-const initialEdges = [
-  { id: "e1-2", source: "1", target: "2" },
-  { id: "e1-3", source: "1", target: "3" },
-  { id: "e1-4", source: "1", target: "4" },
-  { id: "e2-5", source: "2", target: "5" },
-  { id: "e3-5", source: "3", target: "5" },
-];
+// const initialNodes = [
+//   { id: "1", position: { x: 0, y: 0 }, data: { label: "1" } },
+//   { id: "2", position: { x: 0, y: 0 }, data: { label: "2" } },
+//   { id: "3", position: { x: 0, y: 0 }, data: { label: "3" } },
+//   { id: "4", position: { x: 0, y: 0 }, data: { label: "4" } },
+//   { id: "5", position: { x: 0, y: 0 }, data: { label: "5" } },
+// ];
+// const initialEdges = [
+//   { id: "e1-2", source: "1", target: "2" },
+//   { id: "e1-3", source: "1", target: "3" },
+//   { id: "e1-4", source: "1", target: "4" },
+//   { id: "e2-5", source: "2", target: "5" },
+//   { id: "e3-5", source: "3", target: "5" },
+// ];
+
+const initialNodes = graph.nodes.map((node, index) => ({
+  id: index.toString(),
+  position: { x: node.x, y: node.y },
+  data: { label: node.name },
+}));
+
+const initialEdges = graph.links.map((link, index) => ({
+  id: `e${link.source.name}-${link.target.name}`,
+  source: graph.nodes.findIndex((n) => n.name === link.source.name).toString(),
+  target: graph.nodes.findIndex((n) => n.name === link.target.name).toString(),
+}));
 
 function Main() {
   const navigate = useNavigate();
