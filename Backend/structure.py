@@ -19,7 +19,7 @@ class Autocomplete:
 
 # Node Class:
 class Node:
-    def __init__(self, id, payload, keyword, parents, children, depth, distance, embedding, x_coord, y_coord):
+    def __init__(self, id, payload, keyword, parents, children, depth, distance, embedding, x_coord, y_coord, autocompleted):
         self.id = id
         self.payload = payload
         self.keyword = keyword
@@ -30,7 +30,7 @@ class Node:
         self.embedding = embedding
         self.x_coord = x_coord
         self.y_coord = y_coord
-        self.autocompleted = False
+        self.autocompleted = autocompleted
 
     # Getters:
     def get_id(self):
@@ -93,10 +93,7 @@ class Node:
     
     def set_y_coord(self, y_coord):
         self.y_coord = y_coord
-    
-    def get_autocompleted(self, autocompleted):
-        self.autocompleted = autocompleted
-    
+        
     # Helper methods:
     def add_parent(self, parent_node):
         self.parents.append(parent_node)
@@ -133,7 +130,8 @@ class Node:
             'distance': self.distance,
             'embedding': self.embedding,
             'x_coord': self.x_coord,
-            'y_coord': self.y_coord
+            'y_coord': self.y_coord,
+            'autocompleted': self.autocompleted
         }
     
     def to_json(self):
@@ -149,10 +147,10 @@ class Graph:
 
     # Helper methods:
     def create_root_node(self):
-        self.node_dict[0] = Node(0, "", "", [], [], 0, 0, [], 0, 0)
+        self.node_dict[0] = Node(0, "", "", [], [], 0, 0, [], 0, 0, False)
 
-    def create_node(self, id, payload, keyword, parents, children, depth, distance, embedding, x_coord, y_coord):
-        self.node_dict[id] = Node(id, payload, keyword, parents, children, depth, distance, embedding, x_coord, y_coord)
+    def create_node(self, id, payload, keyword, parents, children, depth, distance, embedding, x_coord, y_coord, autocomplete):
+        self.node_dict[id] = Node(id, payload, keyword, parents, children, depth, distance, embedding, x_coord, y_coord, autocomplete)
 
     def remove_node(self, node_id):
         self.node_dict.pop(node_id)
@@ -198,7 +196,7 @@ class Graph:
                     "id": edge_id,
                     "source": node_id,
                     "target": str(child_id),
-                    "animated": True
+                    "animated": self.get_node(child_id).get_autocompleted()
                 }
                 edges.append(edge)
         return edges

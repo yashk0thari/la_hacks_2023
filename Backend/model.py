@@ -62,11 +62,11 @@ def generate_keyword_from_sentence(sentence: str):
   return response['choices'][0]['text']
 
 # Testing:
-x = Node("1AJX3s", "What is this shit I'm feeling", "Feeling Shit", ["1AXCc3"], ["6TrQaz", "Ll12Az"], 2, 12.3, [0.2]*1024, 134, 34)
+x = Node("1AJX3s", "What is this shit I'm feeling", "Feeling Shit", ["1AXCc3"], ["6TrQaz", "Ll12Az"], 2, 12.3, [0.2]*1024, 134, 34, False)
 # print(x.to_json())
 
 test_graph = Graph()
-test_graph.create_node("1AJX3s", "What is this shit I'm feeling", "Feeling Shit", ["1AXCc3"], ["6TrQaz", "Ll12Az"], 2, 12.3, [0.2]*1024, 134, 34)
+test_graph.create_node("1AJX3s", "What is this shit I'm feeling", "Feeling Shit", ["1AXCc3"], ["6TrQaz", "Ll12Az"], 2, 12.3, [0.2]*1024, 134, 34, False)
 
 # print(">> ", y.get_node("1AJX3s").to_json())
 test_graph.get_node("1AJX3s").set_x_coord(69.69)
@@ -117,7 +117,7 @@ def create_new_node(sentence: str, autocomplete: Autocomplete, graph: Graph):
             print("creating a new node that's attached to parent node with id: " + str(max_node_id))
             
         graph.create_node(new_node_id, sentence, keyword, [max_node_id],
-        [],parent_node_depth + 1, 0, new_embedding, 0, 0)
+        [],parent_node_depth + 1, 0, new_embedding, 0, 0, False)
 
     else:
         # THE FOLLOWING CODE IS SIMILAR TO THE ABOVE CODE? CAN THINKING OF OPTIMIZATIONS?
@@ -137,7 +137,7 @@ def create_new_node(sentence: str, autocomplete: Autocomplete, graph: Graph):
         graph.get_node(autocomplete.get_parent()).add_child(new_node_id)
 
         graph.create_node(new_node_id, sentence, keyword, [autocomplete.get_parent()],
-        [],parent_node_depth + 1, 0, new_embedding, 0, 0)
+        [],parent_node_depth + 1, 0, new_embedding, 0, 0, True)
 
 
 # print(test_graph.to_json())
