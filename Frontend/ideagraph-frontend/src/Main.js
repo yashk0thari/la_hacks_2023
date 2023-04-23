@@ -381,6 +381,55 @@ function Main() {
             }}
           >
             <img src="mic_temp.svg"></img>
+            <input
+              type="file"
+              name="fileName"
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                opacity: 0,
+                width: "100%",
+                height: "100%",
+                cursor: "pointer",
+              }}
+              onChange={(e) => {
+                const file = e.target.files[0];
+                const fileType = file.type;
+                const endpoint =
+                  fileType === "text/plain"
+                    ? "http://127.0.0.1:8080/user_input/text/"
+                    : fileType === "audio/wav"
+                    ? "http://127.0.0.1:8080/user_input/audio/"
+                    : null;
+                if (endpoint) {
+                  const formData = new FormData();
+                  formData.append("fileName", file);
+                  axios
+                    .post(endpoint, formData)
+                    .then((response) => {
+                      console.log(response)
+                      setNodes(response.data.nodes);
+                      setEdges(response.data.edges);
+
+                      //setting the payload object
+                      const payloadObj = response.data.nodes_data.reduce((acc, cur) => {
+                        const [key, value] = Object.entries(cur)[0];
+                        acc[key] = value;
+                        return acc;
+                      }, {});
+                      setPayload(payloadObj);                           
+                      // Do something with the response data
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                      // Handle the error
+                    });
+                } else {
+                  // Handle unsupported file types
+                }
+              }}
+            />
           </IconButton>
           <IconButton
             style={{
