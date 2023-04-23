@@ -45,11 +45,11 @@ const styles = {
   openToolbarButton: { position: "relative", top: "10px", right: "10px" },
   drawerDiv: { margin: "32px", width: "40vw" },
   sentenceDescription: { marginTop: "24px" },
-  centerChildren: {
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#f6f6f6",
-  },
+  // centerChildren: {
+  //   alignItems: "center",
+  //   justifyContent: "center",
+  //   backgroundColor: "#f6f6f6",
+  // },
   autocompleteButton: {
     marginTop: "1rem",
     borderRadius: "25px",
@@ -59,9 +59,9 @@ const styles = {
 };
 
 const initialNodes = [
-  // { id: "1", type: 'nodeContainer', position: { x: 0, y: 0 }, data: { label: "1", sourceHandle: "a" } },
-  // { id: "2", type: 'nodeContainer', position: { x: 0, y: 0 }, data: { label: "2", sourceHandle: "b" } },
-  // { id: "3", type: 'nodeContainer', position: { x: 0, y: 0 }, data: { label: "3", sourceHandle: "c" } },
+  // { id: "1" , position: { x: 0, y: 0 }, data: { label: "1", sourceHandle: "a" } },
+  // { id: "2", position: { x: 0, y: 0 }, data: { label: "2", sourceHandle: "b" } },
+  // { id: "3", position: { x: 0, y: 0 }, data: { label: "3", sourceHandle: "c" } },
 ];
 const initialEdges = [
   // { id: "e1-2", source: "1", target: "2", sourceHandle: 'a' },
