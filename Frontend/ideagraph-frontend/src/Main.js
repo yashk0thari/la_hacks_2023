@@ -22,6 +22,8 @@ import { useNavigate } from "react-router";
 import axios from "axios";
 import nodeContainer from './nodeContainer.js';
 import './nodeContainer.css';
+import './drawer.css';
+import drawerImage from './abstract.png';
 
 const nodeTypes = { nodeContainer: nodeContainer };
 
@@ -268,10 +270,72 @@ function Main() {
       ModalProps={{ BackdropProps: { invisible: true } }}
       style={styles.drawer}
       >
-    <div style={styles.drawerDiv}>
+
+    
+	<div class="mainDrawerBody">
       {selectedNode !== -1 ? (
        <>
-          <Typography
+       		<div class="importText">
+							<div class="textImportMain">
+  								<h1>{nodes.find((node) => node.id === selectedNode).data.label}</h1>
+							</div>
+
+							<div class="buttonImportMain">
+								<Button
+        						onClick={(e) => {
+          						e.stopPropagation();
+          						sendAutocompleteRequest();
+       				 		}}
+    						>
+        						Autocomplete
+      					</Button>
+							</div>
+					</div>
+
+					<div class="subText">
+					{payload && (
+							<p class="subTextText">
+									{payload[selectedNode][1]}
+							</p>
+
+					)};
+					</div>
+
+
+					<div class="buttonContainers">
+				
+				<div class="buttonOne">
+					<button> Text One </button>
+				</div>
+	
+				<div class="buttonTwo">
+					<button> Text Two </button>
+				</div>
+	
+					<div class="buttonThree">
+					<button> Text Three </button>
+					</div>
+	
+					<div class="buttonFour">
+					<button> Text Four </button>
+					</div>
+	
+	
+				</div>
+	
+				<div class="mainTextText"> 
+	
+					<p>{nodes.find((node) => node.id === "0").data.payload}</p>
+	
+	
+				</div>
+	
+				{/* <div class="imgContainerContainer"> */}
+					<img src={drawerImage}></img>
+				{/* </div> */}
+
+
+          {/* <Typography
             fontWeight="bold"
             style={styles.typoSpaced}
             sx={{ fontSize: "1.75rem" }}
@@ -285,9 +349,10 @@ function Main() {
             >
               {payload[selectedNode]}
            </Typography>
-          )}
+          )} */}
         </>
       ) : (
+			
       <Typography
         style={styles.sentenceDescription}
         sx={{ fontSize: "1rem" }}
@@ -296,7 +361,7 @@ function Main() {
         sentence should be about this long.
       </Typography>
       )}
-          <Button
+          {/* <Button
         variant="contained"
         color="primary"
         size="large"
@@ -308,7 +373,7 @@ function Main() {
       
       >
         Autocomplete
-      </Button>
+      </Button> */}
     </div>
 </Drawer>
     
