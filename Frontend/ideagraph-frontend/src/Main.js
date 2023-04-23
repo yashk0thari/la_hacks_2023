@@ -245,8 +245,27 @@ function Main() {
         });
 
         mediaRecorder.addEventListener("stop", () => {
-          const audioBlob = new Blob(chunks, { type: "audio/wav" });
-          setAudioBlob(audioBlob);
+          const audioBlob1 = new Blob(chunks, { type: "audio/wav" });
+          // setAudioBlob(audioBlob);
+          if (audioBlob1) {
+            const formData = new FormData();
+            formData.append(
+              "audio",
+              audioBlob1,
+              "audio" + Date.now().toString() + ".wav"
+            );
+            console.log("attempt to upload 2");
+            fetch("http://127.0.0.1:8080/user_input/audio", {
+              method: "POST",
+              body: formData,
+            })
+              .then((response) => {
+                console.log("Audio uploaded successfully: ", response);
+              })
+              .catch((err) => {
+                console.error("Error uploading audio: ", err);
+              });
+          }
           chunks = [];
         });
       })
@@ -262,28 +281,29 @@ function Main() {
     }
   };
 
-  const handleAudioUpload = () => {
-    console.log("attempt to upload");
-    if (audioBlob) {
-      const formData = new FormData();
-      formData.append(
-        "audio",
-        audioBlob,
-        "audio" + Date.now().toString() + ".wav"
-      );
-
-      fetch("http://127.0.0.1:8080/user_input/audio", {
-        method: "POST",
-        body: formData,
-      })
-        .then((response) => {
-          console.log("Audio uploaded successfully: ", response);
-        })
-        .catch((err) => {
-          console.error("Error uploading audio: ", err);
-        });
-    }
-  };
+  // const handleAudioUpload = () => {
+  //   console.log("attempt to upload");
+  //   console.log(audioBlob);
+  //   if (audioBlob) {
+  //     const formData = new FormData();
+  //     formData.append(
+  //       "audio",
+  //       audioBlob,
+  //       "audio" + Date.now().toString() + ".wav"
+  //     );
+  //     console.log("attempt to upload 2");
+  //     fetch("http://127.0.0.1:8080/user_input/audio", {
+  //       method: "POST",
+  //       body: formData,
+  //     })
+  //       .then((response) => {
+  //         console.log("Audio uploaded successfully: ", response);
+  //       })
+  //       .catch((err) => {
+  //         console.error("Error uploading audio: ", err);
+  //       });
+  //   }
+  // };
 
   return (
     <div style={styles.mainDiv}>
@@ -458,7 +478,7 @@ function Main() {
                 startRecording();
               } else {
                 stopRecording();
-                handleAudioUpload();
+                // handleAudioUpload();
               }
             }}
           >
