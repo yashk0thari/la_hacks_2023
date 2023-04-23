@@ -17,9 +17,25 @@ import {
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { Drawer } from "@mui/material";
-import dagre from "dagre";
 import { useNavigate } from "react-router";
 import axios from "axios";
+import { getSimulation } from "./tree";
+
+const { graph, simulation } = getSimulation(
+  "http://127.0.0.1:8080/user_input",
+  "UCLA is truly one of the public universities of all time. It is very big and i like it."
+);
+const initialNodes = graph.nodes.map((node, index) => ({
+  id: index.toString(),
+  position: { x: node.x, y: node.y },
+  data: { label: node.name },
+}));
+
+const initialEdges = graph.links.map((link, index) => ({
+  id: `e${link.source.name}-${link.target.name}`,
+  source: graph.nodes.findIndex((n) => n.name === link.source.name).toString(),
+  target: graph.nodes.findIndex((n) => n.name === link.target.name).toString(),
+}));
 
 const styles = {
   mainDiv: {
@@ -48,20 +64,20 @@ const styles = {
   },
 };
 
-const initialNodes = [
-  // { id: "1", position: { x: 0, y: 0 }, data: { label: "1" } },
-  // { id: "2", position: { x: 0, y: 0 }, data: { label: "2" } },
-  // { id: "3", position: { x: 0, y: 0 }, data: { label: "3" } },
-  // { id: "4", position: { x: 0, y: 0 }, data: { label: "4" } },
-  // { id: "5", position: { x: 0, y: 0 }, data: { label: "5" } },
-];
-const initialEdges = [
-  // { id: "e1-2", source: "1", target: "2" },
-  // { id: "e1-3", source: "1", target: "3" },
-  // { id: "e1-4", source: "1", target: "4" },
-  // { id: "e2-5", source: "2", target: "5" },
-  // { id: "e3-5", source: "3", target: "5" },
-];
+// const initialNodes = [
+//   { id: "1", position: { x: 0, y: 0 }, data: { label: "1" } },
+//   { id: "2", position: { x: 0, y: 0 }, data: { label: "2" } },
+//   { id: "3", position: { x: 0, y: 0 }, data: { label: "3" } },
+//   { id: "4", position: { x: 0, y: 0 }, data: { label: "4" } },
+//   { id: "5", position: { x: 0, y: 0 }, data: { label: "5" } },
+// ];
+// const initialEdges = [
+//   { id: "e1-2", source: "1", target: "2" },
+//   { id: "e1-3", source: "1", target: "3" },
+//   { id: "e1-4", source: "1", target: "4" },
+//   { id: "e2-5", source: "2", target: "5" },
+//   { id: "e3-5", source: "3", target: "5" },
+// ];
 
 function Main() {
   const navigate = useNavigate();
@@ -82,8 +98,9 @@ function Main() {
     setDrawerOpen(true);
     // post request testing
     console.log("making post request");
-    const text = "The temperature in Tokyo is currently 25 degrees. Celsius with a relative humidity of 70%. The population of Iceland is approximately 364,000 people as of 2021. The Mona Lisa painting was created by Leonardo da Vinci in the 16th century and is currently housed in the Louvre Museum in Paris. The highest peak in the world, Mount Everest, stands at 8,848 meters above sea level. The chemical formula for water is H2O, which consists of two hydrogen atoms and one oxygen atom. The average lifespan of a housefly is only around 30 days. The speed of light is approximately 299,792,458 meters per second in a vacuum."
-    const text1 = "I love Tokyo! it's my favourite city in the world"
+    const text =
+      "The temperature in Tokyo is currently 25 degrees. Celsius with a relative humidity of 70%. The population of Iceland is approximately 364,000 people as of 2021. The Mona Lisa painting was created by Leonardo da Vinci in the 16th century and is currently housed in the Louvre Museum in Paris. The highest peak in the world, Mount Everest, stands at 8,848 meters above sea level. The chemical formula for water is H2O, which consists of two hydrogen atoms and one oxygen atom. The average lifespan of a housefly is only around 30 days. The speed of light is approximately 299,792,458 meters per second in a vacuum.";
+    const text1 = "I love Tokyo! it's my favourite city in the world";
     const dummyData = {
       text: "UCLA is an amazing university, I love UCLA!.",
       // text : "John",
@@ -121,43 +138,6 @@ function Main() {
       navigate("/");
     }
   }, []);
-
-  useEffect(() => {
-    const graph = new dagre.graphlib.Graph();
-
-    graph.setDefaultEdgeLabel(() => ({}));
-    graph.setGraph({ rankdir: "TB" });
-
-    nodes.forEach((node) => {
-      console.log(node);
-      graph.setNode(node.id, { width: 100, height: 100 });
-    });
-
-    edges.forEach((edge) => {
-      graph.setEdge(edge.source, edge.target);
-    });
-
-    dagre.layout(graph);
-
-    const newNodes = nodes.map((node) => ({
-      ...node,
-      position: {
-        x: graph.node(node.id).x * 1.1,
-        y: graph.node(node.id).y * 1.1,
-      },
-    }));
-
-    console.log(nodes);
-    setNodes(newNodes);
-    console.log(newNodes);
-  }, [edges]); // empty because we want to allow the user to move nodes around
-
-  const layout = {
-    name: "dagre",
-    rankDir: "TB",
-    nodeDimensionsIncludeLabels: true,
-    animate: true,
-  };
 
   const [selectedFile, setSelectedFile] = useState(null);
 
@@ -213,6 +193,29 @@ function Main() {
       });
   }
 
+  useEffect(() => {
+    const handleTick = () => {
+      const newNodes = nodes.map((node, i) => {
+        const graphNode = graph.nodes[i];
+        return {
+          ...node,
+          position: {
+            x: graphNode.x,
+            y: graphNode.y,
+          },
+        };
+      });
+
+      setNodes(newNodes);
+    };
+
+    simulation.on("tick", handleTick);
+
+    return () => {
+      simulation.on("tick", null); // Remove the event listener when the component is unmounted
+    };
+  }, [nodes, setNodes]);
+
   return (
     <div style={styles.mainDiv}>
       <Drawer
@@ -251,7 +254,6 @@ function Main() {
       <ReactFlow
         nodes={nodes}
         edges={edges}
-        layout={layout}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}

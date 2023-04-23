@@ -38,7 +38,7 @@ import * as d3 from "d3";
 
 // export { graph, simulation };
 
-export default function getSimulation(url, text) {
+function getSimulation(url, text) {
   const data = { text };
   let graph = {};
   axios
