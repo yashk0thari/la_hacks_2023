@@ -184,8 +184,8 @@ function Main() {
     const newNodes = nodes.map((node) => ({
       ...node,
       position: {
-        x: graph.node(node.id).x * 1.1,
-        y: graph.node(node.id).y * 1.1,
+        x: graph.node(node.id).x * 3.5,
+        y: graph.node(node.id).y * 3.5,
       },
     }));
 
