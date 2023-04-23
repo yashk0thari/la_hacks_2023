@@ -1,5 +1,5 @@
 #import functions/classes
-from model import create_new_node
+from model import create_new_node, co, generate_keyword_from_sentence
 from pre_process import data_preprocess
 from structure import Graph, Node, Autocomplete
 from auto_complete import auto_complete, query_complete
@@ -19,7 +19,7 @@ graph = Graph()
 app = Flask(__name__)
 CORS(app, origins=['http://localhost:3000'])
 
-_path = "/Users/valley/Desktop/External_Finder/Hackathons/la_hacks_2023/Backend/uploads/"
+_path = _path = os.getcwd() +  "/uploads/"
 app.config['UPLOAD_FOLDER'] = _path  # Choose the folder where you want to save the uploaded files.
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # Set the maximum allowed file size to 16 MB.
 app.config['SECRET_KEY'] = 'your secret key'  # Set your secret key for flash messages.
@@ -169,6 +169,11 @@ def process_graph_object_from_file():
         if (sentence == ""):
             raise HTTPException(status_code=404, detail="Sentence cannot be null.")
         create_new_node(sentence, None, graph)
+
+    summary = co.summarize(text = ' '.join(text_sentences))
+    keyword = generate_keyword_from_sentence(summary.summary)
+    graph.get_node(0).set_keyword(keyword)
+    graph.get_node(0).set_payload(summary.summary)
     return graph.to_json()
 
 if __name__ == "__main__":

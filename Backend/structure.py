@@ -173,6 +173,7 @@ class Graph:
             'data': {
                 'label': str(data_dict['keyword']),
                 'sourceHandle': str(data_dict['id']),
+                'payload': str(data_dict['payload'])
             }
         }
         return formatted_data
