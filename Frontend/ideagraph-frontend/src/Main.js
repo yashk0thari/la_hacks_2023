@@ -1,4 +1,4 @@
-import { Button, ListItemButton, Typography } from "@mui/material";
+import { Button, Grid, ListItemButton, Typography } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
 import {
   Background,
@@ -18,6 +18,12 @@ import axios from "axios";
 const styles = {
   mainDiv: { position: "relative", height: "100vh" },
   signOutButton: {
+    position: "absolute",
+    top: "10px",
+    right: "10px",
+    zIndex: "1",
+  },
+  recordAudioButton: {
     position: "absolute",
     top: "10px",
     right: "10px",
@@ -137,6 +143,60 @@ function Main() {
     animate: true,
   };
 
+  const [selectedFile, setSelectedFile] = useState(null);
+
+  const handleFileInputChange = (event) => {
+    setSelectedFile(event.target.files[0]);
+  };
+
+  const handleUploadButtonClick = () => {
+    // Handle file upload logic here
+    console.log("Selected file:", selectedFile);
+  };
+
+  function recordAndSendAudio() {
+    // Access the user's microphone and start recording
+    navigator.mediaDevices
+      .getUserMedia({ audio: true })
+      .then((stream) => {
+        const mediaRecorder = new MediaRecorder(stream);
+        const chunks = [];
+
+        mediaRecorder.addEventListener("dataavailable", (event) => {
+          chunks.push(event.data);
+        });
+
+        mediaRecorder.addEventListener("stop", () => {
+          const blob = new Blob(chunks, { type: "audio/wav" });
+
+          // Send the audio data in a POST request
+          const formData = new FormData();
+          formData.append("audio", blob);
+
+          fetch("/api/audio", {
+            method: "POST",
+            body: formData,
+          })
+            .then((response) => {
+              console.log("Audio uploaded successfully!");
+            })
+            .catch((error) => {
+              console.error("Error uploading audio:", error);
+            });
+        });
+
+        // Record for 10 seconds
+        mediaRecorder.start(10000);
+
+        setTimeout(() => {
+          mediaRecorder.stop();
+        }, 10000);
+      })
+      .catch((error) => {
+        console.error("Error accessing microphone:", error);
+      });
+  }
+
   return (
     <div style={styles.mainDiv}>
       <Drawer
@@ -190,6 +250,30 @@ function Main() {
         <MiniMap />
         <Background variant="dots" gap={12} size={1} />
       </ReactFlow>
+      <Grid container spacing={2} justifyContent="center" alignItems="center">
+        <Grid item xs={12}>
+          <Typography variant="h4" align="center">
+            Select a file to upload
+          </Typography>
+        </Grid>
+        <Grid item xs={12}>
+          <input id="file-input" type="file" onChange={handleFileInputChange} />
+          <Button variant="contained" component="span">
+            Record audio
+          </Button>
+        </Grid>
+        <Grid item xs={12}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleUploadButtonClick}
+            disabled={!selectedFile}
+            fullWidth
+          >
+            Upload
+          </Button>
+        </Grid>
+      </Grid>
     </div>
   );
 }
