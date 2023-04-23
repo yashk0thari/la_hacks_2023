@@ -1,4 +1,4 @@
-import { Typography } from "@mui/material";
+import { Grid, Typography } from "@mui/material";
 import "./LoginScreen.css";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -11,23 +11,40 @@ const styles = {
   topPane: {
     marginLeft: "-8px",
     marginTop: "-8px", // i have no idea why it's making me do this
-    width: "60%",
+    width: "50%",
     height: "100vh",
-    backgroundColor: "blue",
+    backgroundColor: "#f6f6f6",
   },
   bottomPane: {
-    width: "40%",
+    width: "50%",
     height: "100vh",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: "#f6f6f6",
   },
   whiteText: {
     textColor: "white",
   },
   typoSpaced: {
-    marginTop: "32px",
-    marginLeft: "32px",
+    marginTop: "100px",
+    marginLeft: "150px",
+  },
+  typoSpaced0: {
+    marginTop: "-40px",
+    marginLeft: "150px",
+  },
+  typoSpaced1: {
+    marginTop: "24px",
+    marginLeft: "150px",
+  },
+  typoSpacedG: {
+    marginTop: "40px",
+    marginLeft: "144px",
+  },
+  imgPad: {
+    marginLeft: "40px",
+    marginTop: "-24px",
   },
 };
 
@@ -74,20 +91,42 @@ function LoginScreen() {
         {/* <h1 style={styles.whiteText}>Welcome to IdeaGraph.</h1> */}
         <Typography
           style={styles.typoSpaced}
-          sx={{ fontSize: "7rem", color: "white" }}
+          sx={{ fontSize: "6rem", color: "#727272", fontWeight: "bold" }}
         >
-          Welcome to IdeaGraph.
+          Welcome
+        </Typography>
+        <Grid container>
+          <Typography
+            style={styles.typoSpaced0}
+            sx={{ fontSize: "6rem", color: "#727272", fontWeight: "bold" }}
+          >
+            to
+          </Typography>
+          <img src="connection_symbol.svg" style={styles.imgPad}></img>
+        </Grid>
+
+        <Typography
+          style={styles.typoSpaced0}
+          sx={{ fontSize: "6rem", color: "#727272", fontWeight: "bold" }}
+        >
+          IdeaGraph.
         </Typography>
 
         <Typography
-          style={styles.typoSpaced}
-          sx={{ fontSize: "2.5rem", color: "white" }}
+          style={styles.typoSpaced1}
+          sx={{ fontSize: "2rem", color: "#727272" }}
         >
           An AI-powered assistant for your consciousness.
         </Typography>
+        <div id="signInDiv" style={styles.typoSpacedG}></div>
       </div>
       <div style={styles.bottomPane}>
-        <div id="signInDiv"></div>
+        {/* <div id="signInDiv"></div> */}
+        <img
+          src="landing_bg_right.svg"
+          style={{ width: "70%", height: "70%" }}
+          alt="right side background"
+        ></img>
       </div>
     </div>
   );
