@@ -52,7 +52,8 @@ function nodeContainer({ data, isConnectable }) {
             
 
         </div> */}
-    </div>
+
+      </div>
   );
 }
 

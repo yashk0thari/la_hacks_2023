@@ -26,7 +26,6 @@ CONNECT_ROOT_TO_HEAD = 0.5
 NODE_TOO_SIMILAR_TO_ANOTHER = 0.9
 
 #Testing-Arjun
-
 test_string = """
 I need you to help me build a knowledge graph. I have some text from a presentation, and I want you to map that out from a basic idea (the root node) to more specific things about this idea. I also want you to assume the person who wrote this text isn't fully informed, so you must insert your own ideas into this as you please. Give me a graph representation in text form. Here is the text:
 
