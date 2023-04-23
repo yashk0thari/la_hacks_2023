@@ -44,23 +44,6 @@ def calculate_similarity(node_a, node_b):
         return 0;
     return np.dot(node_a, node_b) / (np.linalg.norm(node_a) * np.linalg.norm(node_b))
 
-def generate_keyword_from_sentence(sentence: str):
-  prompt = """
-    Extract a descriptive keyword that gives the core idea of a sentence. Here is the sentence:
-  
-    """ + sentence + ". Keyword: \n"
-#   response = co.generate(prompt, model = "xlarge", 
-#         max_tokens=10,
-#         temperature=0.2,
-#         frequency_penalty=0.8,
-#         presence_penalty=0.0,
-#         p = 0
-# ).generations[0].text
-#   return response
-
-  response = openai.Completion.create(engine="text-davinci-003",prompt=prompt)
-  return response['choices'][0]['text']
-
 def generate_emoji_from_sentence(sentence: str):
     prompt = """
     For this sentence, reply with only one emoji that summarizes it, the reply should contain only 1 character that is the emoji itself:  
@@ -77,6 +60,28 @@ def generate_emoji_from_sentence(sentence: str):
 
     response = openai.Completion.create(engine="text-davinci-003",prompt=prompt)
     return response['choices'][0]['text']
+
+
+
+def generate_keyword_from_sentence(sentence: str):
+  prompt = """
+    Extract a descriptive keyword that gives the core idea of a sentence. Here is the sentence:
+  
+    """ + sentence + ". Keyword: \n"
+  emoji = generate_emoji_from_sentence(sentence)
+#   response = co.generate(prompt, model = "xlarge", 
+#         max_tokens=10,
+#         temperature=0.2,
+#         frequency_penalty=0.8,
+#         presence_penalty=0.0,
+#         p = 0
+# ).generations[0].text
+#   return response
+
+  response = openai.Completion.create(engine="text-davinci-003",prompt=prompt)
+  return (response['choices'][0]['text']) + emoji
+
+
 
 
 # Testing:
@@ -162,4 +167,3 @@ def create_new_node(sentence: str, autocomplete: Autocomplete, graph: Graph):
 # create_new_node(test_sentences[0], None, test_graph)
 # print(test_graph.to_json())
 
-print("> ", generate_emoji_from_sentence("Water turns into ice when you freeze it"))

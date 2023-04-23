@@ -196,7 +196,8 @@ class Graph:
                     "id": edge_id,
                     "source": node_id,
                     "target": str(child_id),
-                    "animated": self.get_node(child_id).get_autocompleted()
+                    "animated": self.get_node(child_id).get_autocompleted(),
+                    "className": "red" if self.get_node(child_id).get_autocompleted() else 'none'
                 }
                 edges.append(edge)
         return edges
