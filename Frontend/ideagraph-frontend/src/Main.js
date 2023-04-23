@@ -45,11 +45,11 @@ const styles = {
   openToolbarButton: { position: "relative", top: "10px", right: "10px" },
   drawerDiv: { margin: "32px", width: "40vw" },
   sentenceDescription: { marginTop: "24px" },
-  // centerChildren: {
-  //   alignItems: "center",
-  //   justifyContent: "center",
-  //   backgroundColor: "#f6f6f6",
-  // },
+  centerChildren: {
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#f6f6f6",
+  },
   autocompleteButton: {
     marginTop: "1rem",
     borderRadius: "25px",
