@@ -10,10 +10,15 @@ import numpy as np
 import os
 import cohere
 import string
+import openai
 
 #define API Key and cohere client
 API_KEY = "1g4kF4R2RpuNTB3ehW1tRWW4QMh3pbF8zgdJGSl8"
 co = cohere.Client(API_KEY)
+
+#define Open AI Key and Client
+OPENAI_API_KEY = "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"
+openai.api_key = OPENAI_API_KEY
 
 #global_constants
 CONNECT_ROOT_TO_HEAD = 0.5
@@ -45,15 +50,17 @@ def generate_keyword_from_sentence(sentence: str):
     Example keyword: Puebloan Pottery\n\,
     Sentence: 
     """ + sentence + ". Keyword: \n"
+#   response = co.generate(prompt, model = "xlarge", 
+#         max_tokens=10,
+#         temperature=0.2,
+#         frequency_penalty=0.8,
+#         presence_penalty=0.0,
+#         p = 0
+# ).generations[0].text
+#   return response
 
-  response = co.generate(prompt, model = "xlarge", 
-        max_tokens=10,
-        temperature=0.2,
-        frequency_penalty=0.8,
-        presence_penalty=0.0,
-        p = 0
-).generations[0].text
-  return response
+  response = openai.Completion.create(engine="text-davinci-003",prompt=prompt)
+  return response['choices'][0]['text']
 
 # Testing:
 x = Node("1AJX3s", "What is this shit I'm feeling", "Feeling Shit", ["1AXCc3"], ["6TrQaz", "Ll12Az"], 2, 12.3, [0.2]*1024, 134, 34)
