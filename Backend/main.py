@@ -2,6 +2,7 @@
 from model import create_new_node
 from pre_process import data_preprocess
 from structure import Graph, Node
+from auto_complete import auto_complete, query_complete
 
 #import Relevant libraries
 from flask import Flask, request, make_response, redirect, url_for, jsonify
@@ -16,9 +17,10 @@ graph = Graph()
 
 # Define App:
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = '/Users/valley/Desktop/External_Finder/Hackathons/la_hacks_2023/Backend/uploads'  # Choose the folder where you want to save the uploaded files.
+_path = "/Users/arjunrajloomba/Desktop/la-hack1/la_hacks_2023/Backend/uploads/"
+app.config['UPLOAD_FOLDER'] = _path  # Choose the folder where you want to save the uploaded files.
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # Set the maximum allowed file size to 16 MB.
-app.config['SECRET_KEY'] = 'your_secret_key'  # Set your secret key for flash messages.
+app.config['SECRET_KEY'] = 'your secret key'  # Set your secret key for flash messages.
 
 ALLOWED_EXTENSIONS = {'txt', 'wav'}
 
@@ -33,6 +35,7 @@ CORS(app, origins=['http://localhost:3000'])
 def home():
     return "HOME"
 
+#string text input
 @app.route("/user_input", methods = ['POST'])
 def process_user_input():
     if request.method == "POST":
@@ -55,6 +58,37 @@ def process_graph_object(text):
         create_new_node(sentence, graph)
     return graph.to_json()
 
+#autocompleter - pass in the Node ID in the JSON
+@app.route('/post/autocomplete', methods = ['POST'])
+def process_user_autocomplete():
+    if request.method == "POST":
+        id = request.json['id']
+        # Generate the URL for the target endpoint
+        response = requests.get(f"http://127.0.0.1:8080/get/autocomplete/{id}")
+        # # Make an HTTP request to the target endpoint
+        # response = requests.get(endpoint2_url)
+    return response.content
+
+#autocompleter - Get request
+@app.route('/get/autocomplete/<string:id>', methods = ['GET'])
+def process_autocomplete_data(id):
+    print("id: " + id)
+    print(graph.get_nodes_ids())
+    lst = graph.get_nodes_ids()
+    for i in range(len(lst)):
+        if (str(lst[i]) == str(id)):
+            node = graph.get_node(str(id))
+            sentence = node.get_payload()
+            response = auto_complete(sentence)
+            return {
+                "autocomplete_data": response
+            }
+
+    return {
+        "autocomplete_data": "node not found!"
+    }
+
+#audio input
 @app.route('/user_input/audio/', methods = ['POST'])
 def process_user_audio_input():
     if request.method == 'POST':
@@ -67,7 +101,7 @@ def process_user_audio_input():
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             if (".wav" in filename):
-                text = run_whisper("/Users/valley/Desktop/External_Finder/Hackathons/la_hacks_2023/Backend/uploads/" + filename)
+                text = run_whisper(_path+"/"+ filename)
 
                 payload = {"text": text}
 
@@ -84,6 +118,7 @@ def process_user_audio_input():
     </form>
     '''
 
+#file input
 @app.route('/user_input/text/', methods = ['POST'])
 def process_user_text_input():
     if request.method == 'POST':
@@ -96,7 +131,7 @@ def process_user_text_input():
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             if (".txt" in filename):
-                with open("/Users/valley/Desktop/External_Finder/Hackathons/la_hacks_2023/Backend/uploads/" + filename) as f:
+                with open(_path + filename) as f:
                     text = ""
                     for i in f.readlines():
                         text += i + ". "
@@ -126,8 +161,6 @@ def process_graph_object_from_file():
             raise HTTPException(status_code=404, detail="Sentence cannot be null.")
         create_new_node(sentence, graph)
     return graph.to_json()
-
-
 
 if __name__ == "__main__":
 	app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))

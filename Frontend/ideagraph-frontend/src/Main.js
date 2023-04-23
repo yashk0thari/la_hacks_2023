@@ -82,8 +82,10 @@ function Main() {
     setDrawerOpen(true);
     // post request testing
     console.log("making post request");
+    const text = "The temperature in Tokyo is currently 25 degrees. Celsius with a relative humidity of 70%. The population of Iceland is approximately 364,000 people as of 2021. The Mona Lisa painting was created by Leonardo da Vinci in the 16th century and is currently housed in the Louvre Museum in Paris. The highest peak in the world, Mount Everest, stands at 8,848 meters above sea level. The chemical formula for water is H2O, which consists of two hydrogen atoms and one oxygen atom. The average lifespan of a housefly is only around 30 days. The speed of light is approximately 299,792,458 meters per second in a vacuum."
+    const text1 = "I love Tokyo! it's my favourite city in the world"
     const dummyData = {
-      text: "UCLA is a great public university.",
+      text: "UCLA is an amazing university, I love UCLA!.",
       // text : "John",
     };
     const url = "http://localhost:8080/user_input";

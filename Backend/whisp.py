@@ -8,3 +8,5 @@ def run_whisper(file):
     model = whisper.load_model("base")
     result = model.transcribe(file, fp16 = False)
     return result["text"]
+
+# print(run_whisper("/Users/arjunrajloomba/Desktop/recording1.wav"))
