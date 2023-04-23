@@ -20,7 +20,7 @@ function nodeContainer({ data, isConnectable }) {
 
         <div class="container">
             
-                <img src="images/map@2x.png"></img>
+                <img src="connection_symbol.svg"></img>
                 <span class="titleText">{x.label}</span>
          
         </div>
@@ -35,7 +35,7 @@ function nodeContainer({ data, isConnectable }) {
         
         </div>
 
-        <div class="mainLower">
+        {/* <div class="mainLower">
 
             <div class="categoryOne">
 
@@ -56,7 +56,7 @@ function nodeContainer({ data, isConnectable }) {
             </div>
             
 
-        </div>
+        </div> */}
 
     </div>
   );

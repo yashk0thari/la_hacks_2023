@@ -36,6 +36,13 @@ const styles = {
     right: "10px",
     zIndex: "1",
   },
+  regenerateButton: {
+    positon: "absolute",
+    top: "10px",
+    left: "1220px",
+    zIndex: "1",
+    margin:0
+  },
   recordAudioButton: {
     position: "absolute",
     top: "10px",
@@ -96,16 +103,16 @@ function Main() {
       // text : "John",
     };
     const url = "http://localhost:8080/user_input";
-    // axios
-    //   .post(url, dummyData)
-    //   .then((response) => {
-    //     console.log(response.data.nodes);
-    //     setNodes(response.data.nodes);
-    //     setEdges(response.data.edges);
-    //   })
-    //   .catch((error) => {
-    //     console.error(error);
-    //   });
+    axios
+      .post(url, dummyData)
+      .then((response) => {
+        console.log(response.data.nodes);
+        setNodes(response.data.nodes);
+        setEdges(response.data.edges);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   };
 
     //Action when an autocomplete request is made
@@ -276,7 +283,7 @@ function Main() {
               style={styles.sentenceDescription}
               sx={{ fontSize: "1rem" }}
             >
-              {payload[selectedNode][1]}
+              {payload[selectedNode]}
            </Typography>
           )}
         </>
@@ -304,6 +311,28 @@ function Main() {
       </Button>
     </div>
 </Drawer>
+    
+    
+    <Button
+        variant="outlined"
+        style={styles.regenerateButton}
+        onClick={() => {
+          const url = "http://localhost:8080/reset_graph";
+          axios
+            .get(url)
+            .then((response) => {
+              setNodes(initialNodes);
+              setEdges(initialEdges);         
+             })
+            .catch((error) => {
+              console.error(error);
+            });
+      
+        }}
+      >
+        Regenerate Graph
+      </Button>
+
       <Button
         variant="outlined"
         style={styles.signOutButton}
@@ -315,6 +344,7 @@ function Main() {
       >
         Sign Out
       </Button>
+
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -386,7 +416,7 @@ function Main() {
                   axios
                     .post(endpoint, formData)
                     .then((response) => {
-                      // console.log(response.data.nodes_data)
+                      console.log(response)
                       setNodes(response.data.nodes);
                       setEdges(response.data.edges);
 
@@ -396,7 +426,6 @@ function Main() {
                         acc[key] = value;
                         return acc;
                       }, {});
-                      console.log(payloadObj)
                       setPayload(payloadObj);                           
                       // Do something with the response data
                     })
