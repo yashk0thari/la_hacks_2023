@@ -46,6 +46,12 @@ const styles = {
     justifyContent: "center",
     backgroundColor: "#f6f6f6",
   },
+  autocompleteButton: {
+    marginTop: "1rem",
+    borderRadius: "25px",
+    textTransform: "capitalize",
+    fontWeight: "bold",
+  }
 };
 
 const initialNodes = [
@@ -77,6 +83,7 @@ function Main() {
     [setEdges]
   );
 
+  //Action when a node is clicked
   const handleNodeClick = (event, element) => {
     console.log("Node clicked:", element.id);
     setSelectedNode(element.id);
@@ -100,6 +107,42 @@ function Main() {
       .catch((error) => {
         console.error(error);
       });
+  };
+
+    //Action when an autocomplete request is made
+  const sendAutocompleteRequest = () => {
+    // Your axios POST request logic goes here
+    const url = "http://localhost:8080/post/autocomplete"; // endpoint
+    const data = {
+      id: selectedNode // The current node's id is passed
+    };
+
+    axios
+    .post(url, data)
+    .then((response) => {
+      // Handle the response, e.g., update the UI with the autocomplete results
+      console.log("Autocomplete response:", response.data.autocomplete_data);
+      console.log("Edges: ", response.data.graph_data.edges)
+      console.log("Nodes: ", response.data.graph_data.nodes)
+
+      setNodes(response.data.graph_data.nodes);
+      setEdges(response.data.graph_data.edges);
+
+      //setting the payload object
+      const payloadObj = response.data.graph_data.nodes_data.reduce((acc, cur) => {
+        const [key, value] = Object.entries(cur)[0];
+        acc[key] = value;
+        return acc;
+      }, {});
+      setPayload(payloadObj);                           
+
+      
+    })
+    .catch((error) => {
+      // Handle the error
+      console.error("Autocomplete error:", error);
+    });
+
   };
 
   useEffect(() => {
@@ -130,7 +173,6 @@ function Main() {
     graph.setGraph({ rankdir: "TB" });
 
     nodes.forEach((node) => {
-      console.log(node);
       graph.setNode(node.id, { width: 100, height: 100 });
     });
 
@@ -148,9 +190,8 @@ function Main() {
       },
     }));
 
-    console.log(nodes);
     setNodes(newNodes);
-    console.log(newNodes);
+    // setEdges(edges)
   }, [edges]); // empty because we want to allow the user to move nodes around
 
   const layout = {
@@ -216,31 +257,31 @@ function Main() {
 
   return (
     <div style={styles.mainDiv}>
-<Drawer
-  open={isDrawerOpen}
-  ModalProps={{ BackdropProps: { invisible: true } }}
-  style={styles.drawer}
->
-  <div style={styles.drawerDiv}>
-    {selectedNode !== -1 ? (
-      <>
-        <Typography
-          fontWeight="bold"
-          style={styles.typoSpaced}
-          sx={{ fontSize: "1.75rem" }}
-        >
-          {nodes.find((node) => node.id === selectedNode).data.label}
-        </Typography>
-        {payload && (
+    <Drawer
+      open={isDrawerOpen}
+      ModalProps={{ BackdropProps: { invisible: true } }}
+      style={styles.drawer}
+      >
+    <div style={styles.drawerDiv}>
+      {selectedNode !== -1 ? (
+       <>
           <Typography
-            style={styles.sentenceDescription}
-            sx={{ fontSize: "1rem" }}
-          >
-            {payload[selectedNode]}
+            fontWeight="bold"
+            style={styles.typoSpaced}
+            sx={{ fontSize: "1.75rem" }}
+         >
+            {nodes.find((node) => node.id === selectedNode).data.label}
           </Typography>
-        )}
-      </>
-    ) : (
+          {payload && (
+            <Typography
+              style={styles.sentenceDescription}
+              sx={{ fontSize: "1rem" }}
+            >
+              {payload[selectedNode]}
+           </Typography>
+          )}
+        </>
+      ) : (
       <Typography
         style={styles.sentenceDescription}
         sx={{ fontSize: "1rem" }}
@@ -248,8 +289,21 @@ function Main() {
         A single-sentence description of this node will appear here. The
         sentence should be about this long.
       </Typography>
-    )}
-  </div>
+      )}
+          <Button
+        variant="contained"
+        color="primary"
+        size="large"
+        sx={styles.autocompleteButton}
+        onClick={(e) => {
+          e.stopPropagation();
+          sendAutocompleteRequest();
+        }}
+      
+      >
+        Autocomplete
+      </Button>
+    </div>
 </Drawer>
       <Button
         variant="outlined"

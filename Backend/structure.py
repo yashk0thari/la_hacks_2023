@@ -3,6 +3,20 @@ import random
 import math
 import numpy as np
 
+#Autocomplete Class
+class Autocomplete:
+    def __init__(self, response, parent_id):
+        self.response = response
+        self.parent_id = parent_id
+    
+    #Getters
+    def get_response(self):
+        return self.response
+    
+    def get_parent(self):
+        return self.parent_id
+
+
 # Node Class:
 class Node:
     def __init__(self, id, payload, keyword, parents, children, depth, distance, embedding, x_coord, y_coord):
