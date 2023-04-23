@@ -169,8 +169,10 @@ class Graph:
                 'x': data_dict['x_coord'],
                 'y': data_dict['y_coord']
             },
+            "type": 'nodeContainer',
             'data': {
-                'label': str(data_dict['keyword'])
+                'label': str(data_dict['keyword']),
+                'sourceHandle': str(data_dict['id']),
             }
         }
         return formatted_data

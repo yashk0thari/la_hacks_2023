@@ -20,6 +20,10 @@ import { Drawer } from "@mui/material";
 import dagre from "dagre";
 import { useNavigate } from "react-router";
 import axios from "axios";
+import nodeContainer from './nodeContainer.js';
+import './nodeContainer.css';
+
+const nodeTypes = { nodeContainer: nodeContainer };
 
 const styles = {
   mainDiv: {
@@ -55,18 +59,13 @@ const styles = {
 };
 
 const initialNodes = [
-  // { id: "1", position: { x: 0, y: 0 }, data: { label: "1" } },
-  // { id: "2", position: { x: 0, y: 0 }, data: { label: "2" } },
-  // { id: "3", position: { x: 0, y: 0 }, data: { label: "3" } },
-  // { id: "4", position: { x: 0, y: 0 }, data: { label: "4" } },
-  // { id: "5", position: { x: 0, y: 0 }, data: { label: "5" } },
+  // { id: "1" , position: { x: 0, y: 0 }, data: { label: "1", sourceHandle: "a" } },
+  // { id: "2", position: { x: 0, y: 0 }, data: { label: "2", sourceHandle: "b" } },
+  // { id: "3", position: { x: 0, y: 0 }, data: { label: "3", sourceHandle: "c" } },
 ];
 const initialEdges = [
-  // { id: "e1-2", source: "1", target: "2" },
-  // { id: "e1-3", source: "1", target: "3" },
-  // { id: "e1-4", source: "1", target: "4" },
-  // { id: "e2-5", source: "2", target: "5" },
-  // { id: "e3-5", source: "3", target: "5" },
+  // { id: "e1-2", source: "1", target: "2", sourceHandle: 'a' },
+  // { id: "e1-3", source: "1", target: "3", sourceHandle: 'b' },
 ];
 
 function Main() {
@@ -185,8 +184,8 @@ function Main() {
     const newNodes = nodes.map((node) => ({
       ...node,
       position: {
-        x: graph.node(node.id).x * 1.1,
-        y: graph.node(node.id).y * 1.1,
+        x: graph.node(node.id).x * 3.5,
+        y: graph.node(node.id).y * 3.5,
       },
     }));
 
@@ -324,6 +323,7 @@ function Main() {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         onNodeClick={handleNodeClick}
+        nodeTypes={nodeTypes}
         onPaneClick={() => {
           setSelectedNode(-1);
           setDrawerOpen(false);
