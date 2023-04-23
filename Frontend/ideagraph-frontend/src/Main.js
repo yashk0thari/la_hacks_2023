@@ -1,4 +1,10 @@
-import { Button, Grid, ListItemButton, Typography } from "@mui/material";
+import {
+  Button,
+  Grid,
+  IconButton,
+  ListItemButton,
+  Typography,
+} from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
 import {
   Background,
@@ -16,7 +22,10 @@ import { useNavigate } from "react-router";
 import axios from "axios";
 
 const styles = {
-  mainDiv: { position: "relative", height: "100vh" },
+  mainDiv: {
+    position: "relative",
+    height: "100vh",
+  },
   signOutButton: {
     position: "absolute",
     top: "10px",
@@ -32,21 +41,26 @@ const styles = {
   openToolbarButton: { position: "relative", top: "10px", right: "10px" },
   drawerDiv: { margin: "32px", width: "40vw" },
   sentenceDescription: { marginTop: "24px" },
+  centerChildren: {
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#f6f6f6",
+  },
 };
 
 const initialNodes = [
-  { id: "1", position: { x: 0, y: 0 }, data: { label: "1" } },
-  { id: "2", position: { x: 0, y: 0 }, data: { label: "2" } },
-  { id: "3", position: { x: 0, y: 0 }, data: { label: "3" } },
-  { id: "4", position: { x: 0, y: 0 }, data: { label: "4" } },
-  { id: "5", position: { x: 0, y: 0 }, data: { label: "5" } },
+  // { id: "1", position: { x: 0, y: 0 }, data: { label: "1" } },
+  // { id: "2", position: { x: 0, y: 0 }, data: { label: "2" } },
+  // { id: "3", position: { x: 0, y: 0 }, data: { label: "3" } },
+  // { id: "4", position: { x: 0, y: 0 }, data: { label: "4" } },
+  // { id: "5", position: { x: 0, y: 0 }, data: { label: "5" } },
 ];
 const initialEdges = [
-  { id: "e1-2", source: "1", target: "2" },
-  { id: "e1-3", source: "1", target: "3" },
-  { id: "e1-4", source: "1", target: "4" },
-  { id: "e2-5", source: "2", target: "5" },
-  { id: "e3-5", source: "3", target: "5" },
+  // { id: "e1-2", source: "1", target: "2" },
+  // { id: "e1-3", source: "1", target: "3" },
+  // { id: "e1-4", source: "1", target: "4" },
+  // { id: "e2-5", source: "2", target: "5" },
+  // { id: "e3-5", source: "3", target: "5" },
 ];
 
 function Main() {
@@ -74,7 +88,8 @@ function Main() {
     };
     const url = "http://localhost:8080/user_input";
     axios
-      .post(url, dummyData).then((response) => {
+      .post(url, dummyData)
+      .then((response) => {
         console.log(response.data.nodes);
         setNodes(response.data.nodes);
         setEdges(response.data.edges);
@@ -105,7 +120,6 @@ function Main() {
     }
   }, []);
 
-
   useEffect(() => {
     const graph = new dagre.graphlib.Graph();
 
@@ -113,7 +127,7 @@ function Main() {
     graph.setGraph({ rankdir: "TB" });
 
     nodes.forEach((node) => {
-      console.log(node)
+      console.log(node);
       graph.setNode(node.id, { width: 100, height: 100 });
     });
 
@@ -250,7 +264,35 @@ function Main() {
         <MiniMap />
         <Background variant="dots" gap={12} size={1} />
       </ReactFlow>
-      <Grid container spacing={2} justifyContent="center" alignItems="center">
+      {nodes.length === 0 && (
+        <Grid
+          container
+          spacing={10}
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "-65vh",
+          }}
+        >
+          <IconButton
+            style={{
+              transform: "scale(1)",
+              zIndex: "1",
+            }}
+          >
+            <img src="mic_temp.svg"></img>
+          </IconButton>
+          <IconButton
+            style={{
+              transform: "scale()",
+              zIndex: "1",
+            }}
+          >
+            <img src="upload_temp.svg"></img>
+          </IconButton>
+        </Grid>
+      )}
+      {/* <Grid container spacing={2} justifyContent="center" alignItems="center">
         <Grid item xs={12}>
           <Typography variant="h4" align="center">
             Select a file to upload
@@ -273,7 +315,7 @@ function Main() {
             Upload
           </Button>
         </Grid>
-      </Grid>
+      </Grid> */}
     </div>
   );
 }
