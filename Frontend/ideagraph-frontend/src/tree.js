@@ -25,17 +25,14 @@ const simulation = d3
   .forceSimulation(graph.nodes)
   .force(
     "link",
-    d3.forceLink(graph.links).id(function (d) {
-      return d.name;
-    })
+    d3
+      .forceLink(graph.links)
+      .id(function (d) {
+        return d.name;
+      })
+      .distance(200)
   )
-  .force("charge", d3.forceManyBody().strength(-40))
-  .force("center", d3.forceCenter(0, 0))
-  .stop();
+  .force("charge", d3.forceManyBody().strength(-400))
+  .force("center", d3.forceCenter(0, 0));
 
-// Run the simulation to get the initial positions
-for (let i = 0; i < 300; ++i) {
-  simulation.tick();
-}
-
-export { graph };
+export { graph, simulation };

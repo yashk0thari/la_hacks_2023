@@ -1,6 +1,6 @@
 import { Button, ListItemButton, Typography } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
-import { graph } from "./tree";
+import { graph, simulation } from "./tree";
 
 import {
   Background,
@@ -147,6 +147,29 @@ function Main() {
     nodeDimensionsIncludeLabels: true,
     animate: true,
   };
+
+  useEffect(() => {
+    const handleTick = () => {
+      const newNodes = nodes.map((node, i) => {
+        const graphNode = graph.nodes[i];
+        return {
+          ...node,
+          position: {
+            x: graphNode.x,
+            y: graphNode.y,
+          },
+        };
+      });
+
+      setNodes(newNodes);
+    };
+
+    simulation.on("tick", handleTick);
+
+    return () => {
+      simulation.on("tick", null); // Remove the event listener when the component is unmounted
+    };
+  }, [nodes, setNodes]);
 
   return (
     <div style={styles.mainDiv}>
