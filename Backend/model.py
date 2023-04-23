@@ -1,6 +1,6 @@
 #import files
 from pre_process import data_preprocess
-from structure import Node, Graph
+from structure import Node, Graph, Autocomplete
 
 # Import Relavent Libraries:
 import json
@@ -73,7 +73,8 @@ test_graph.create_node("1AJX3s", "What is this shit I'm feeling", "Feeling Shit"
 test_graph.get_node("1AJX3s").set_x_coord(69.69)
 # print(">> ", y.get_node("1AJX3s").to_json())
 
-def create_new_node(sentence, graph: Graph):
+#autocomplete gives the parent node of the id that needs to be autocompleted.
+def create_new_node(sentence: str, autocomplete: Autocomplete, graph: Graph):
     #embedding for new node
     new_embedding = create_embedding([sentence])
     # print(len(new_embedding))
@@ -89,34 +90,56 @@ def create_new_node(sentence, graph: Graph):
     max_similarity = 0
     max_node_id = 0 #parent node id
 
-    #loop through all the nodes to check which node is most similar to - define parent node
-    for node in graph.get_nodes_values():
-        node_embedding = node.get_embedding()
-        if (len(node_embedding) != 0):
-            similarity = calculate_similarity(new_embedding, node_embedding)
-            if (similarity > max_similarity and similarity > CONNECT_ROOT_TO_HEAD):
-                max_similarity = similarity
-                max_node_id = node.get_id()
+    if (autocomplete is None):
+        #loop through all the nodes to check which node is most similar to - define parent node
+        for node in graph.get_nodes_values():
+            node_embedding = node.get_embedding()
+            if (len(node_embedding) != 0):
+                similarity = calculate_similarity(new_embedding, node_embedding)
+                if (similarity > max_similarity and similarity > CONNECT_ROOT_TO_HEAD):
+                    max_similarity = similarity
+                    max_node_id = node.get_id()
 
-    #make sure id is unique
-    new_node_id = ''.join(random.choices(string.ascii_lowercase, k=5))
-    while (new_node_id in graph.get_nodes_ids()):
+        #make sure id is unique
         new_node_id = ''.join(random.choices(string.ascii_lowercase, k=5))
+        while (new_node_id in graph.get_nodes_ids()):
+            new_node_id = ''.join(random.choices(string.ascii_lowercase, k=5))
 
-    #generate a descriptive keyword for the sentence - Cohere generation API
-    keyword = generate_keyword_from_sentence(sentence)
+        #generate a descriptive keyword for the sentence - Cohere generation API
+        keyword = generate_keyword_from_sentence(sentence)
 
-    #get depth of parent node
-    parent_node_depth = graph.get_node(max_node_id).get_depth()
+        #get depth of parent node
+        parent_node_depth = graph.get_node(max_node_id).get_depth()
 
-    #add to the children of the parent node
-    graph.get_node(max_node_id).add_child(new_node_id)
+        #add to the children of the parent node
+        graph.get_node(max_node_id).add_child(new_node_id)
 
-    if (max_similarity != 0 and max_node_id != 0):
-        print("creating a new node that's attached to parent node with id: " + str(max_node_id))
-        
-    graph.create_node(new_node_id, sentence, keyword, [max_node_id],
-    [],parent_node_depth + 1, 0, new_embedding, 0, 0)
+        if (max_similarity != 0 and max_node_id != 0):
+            print("creating a new node that's attached to parent node with id: " + str(max_node_id))
+            
+        graph.create_node(new_node_id, sentence, keyword, [max_node_id],
+        [],parent_node_depth + 1, 0, new_embedding, 0, 0)
+
+    else:
+        # THE FOLLOWING CODE IS SIMILAR TO THE ABOVE CODE? CAN THINKING OF OPTIMIZATIONS?
+
+        #make sure id is unique
+        new_node_id = ''.join(random.choices(string.ascii_lowercase, k=5))
+        while (new_node_id in graph.get_nodes_ids()):
+            new_node_id = ''.join(random.choices(string.ascii_lowercase, k=5))
+
+        #generate a descriptive keyword for the sentence - Cohere generation API
+        keyword = generate_keyword_from_sentence(sentence) + " AUTOCOMPLETED!"
+
+        #get depth of parent node
+        parent_node_depth = graph.get_node(autocomplete.get_parent()).get_depth()
+
+        #add to the children of the parent node
+        graph.get_node(autocomplete.get_parent()).add_child(new_node_id)
+
+        graph.create_node(new_node_id, sentence, keyword, [autocomplete.get_parent()],
+        [],parent_node_depth + 1, 0, new_embedding, 0, 0)
+
 
 # print(test_graph.to_json())
 # create_new_node(test_sentences[0], test_graph)

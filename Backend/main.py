@@ -1,7 +1,7 @@
 #import functions/classes
 from model import create_new_node
 from pre_process import data_preprocess
-from structure import Graph, Node
+from structure import Graph, Node, Autocomplete
 from auto_complete import auto_complete, query_complete
 
 #import Relevant libraries
@@ -56,7 +56,7 @@ def process_graph_object(text):
     for sentence in text_sentences:
         if (sentence == ""):
             raise HTTPException(status_code=404, detail="Sentence cannot be null.")
-        create_new_node(sentence, graph)
+        create_new_node(sentence, None, graph)
     return graph.to_json()
 
 #autocompleter - pass in the Node ID in the JSON
@@ -81,10 +81,12 @@ def process_autocomplete_data(id):
             node = graph.get_node(str(id))
             sentence = node.get_payload()
             response = auto_complete(sentence)
+            #parent id and response in autocompleted graph
+            create_new_node(response, Autocomplete(response, id), graph)
             return {
-                "autocomplete_data": response
+                "autocomplete_data": response + " [AUTOCOMPLETED NODE!]",
+                "graph_data": graph.to_json()
             }
-
     return {
         "autocomplete_data": "node not found!"
     }
@@ -157,37 +159,6 @@ def process_user_text_input():
       <input type=submit value=Upload>
     </form>
     '''
-# @app.route('/user_input/text/', methods = ['POST'])
-# def process_user_text_input():
-#     if request.method == 'POST':
-#         if 'fileName' not in request.files:
-#             return jsonify({"error": "No file part"}), 400
-#         file = request.files['fileName']
-#         if file.filename == '':
-#             return jsonify({"error": "No selected file"}), 400
-#         if file and allowed_file(file.filename):
-#             filename = secure_filename(file.filename)
-#             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-#             if (".txt" in filename):
-#                 with open(_path + filename) as f:
-#                     text = ""
-#                     for i in f.readlines():
-#                         text += i + ". "
-
-#                     payload = {"text": text}
-#                     requests.get(f"http://127.0.0.1:8080/graph_object_from_file/", params = payload)
-                
-
-#             return jsonify({"success": "File uploaded successfully."}), 200
-#     return '''
-#     <!doctype html>
-#     <title>Upload File</title>
-#     <h1>Upload File</h1>
-#     <form method=post enctype=multipart/form-data>
-#       <input type=file name=file>
-#       <input type=submit value=Upload>
-#     </form>
-#     '''
 
 @app.route("/graph_object_from_file/", methods = ['GET'])
 def process_graph_object_from_file():
@@ -197,7 +168,7 @@ def process_graph_object_from_file():
     for sentence in text_sentences:
         if (sentence == ""):
             raise HTTPException(status_code=404, detail="Sentence cannot be null.")
-        create_new_node(sentence, graph)
+        create_new_node(sentence, None, graph)
     return graph.to_json()
 
 if __name__ == "__main__":
