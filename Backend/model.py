@@ -61,15 +61,33 @@ def generate_keyword_from_sentence(sentence: str):
   response = openai.Completion.create(engine="text-davinci-003",prompt=prompt)
   return response['choices'][0]['text']
 
+def generate_emoji_from_sentence(sentence: str):
+    prompt = """
+    For this sentence, reply with only one emoji that summarizes it, the reply should contain only 1 character that is the emoji itself:  
+  
+    """ + sentence
+#   response = co.generate(prompt, model = "xlarge", 
+#         max_tokens=10,
+#         temperature=0.2,
+#         frequency_penalty=0.8,
+#         presence_penalty=0.0,
+#         p = 0
+# ).generations[0].text
+#   return response
+
+    response = openai.Completion.create(engine="text-davinci-003",prompt=prompt)
+    return response['choices'][0]['text']
+
+
 # Testing:
-x = Node("1AJX3s", "What is this shit I'm feeling", "Feeling Shit", ["1AXCc3"], ["6TrQaz", "Ll12Az"], 2, 12.3, [0.2]*1024, 134, 34, False)
+# x = Node("1AJX3s", "What is this shit I'm feeling", "Feeling Shit", ["1AXCc3"], ["6TrQaz", "Ll12Az"], 2, 12.3, [0.2]*1024, 134, 34, False)
 # print(x.to_json())
 
-test_graph = Graph()
-test_graph.create_node("1AJX3s", "What is this shit I'm feeling", "Feeling Shit", ["1AXCc3"], ["6TrQaz", "Ll12Az"], 2, 12.3, [0.2]*1024, 134, 34, False)
+# test_graph = Graph()
+# test_graph.create_node("1AJX3s", "What is this shit I'm feeling", "Feeling Shit", ["1AXCc3"], ["6TrQaz", "Ll12Az"], 2, 12.3, [0.2]*1024, 134, 34, False)
 
 # print(">> ", y.get_node("1AJX3s").to_json())
-test_graph.get_node("1AJX3s").set_x_coord(69.69)
+# test_graph.get_node("1AJX3s").set_x_coord(69.69)
 # print(">> ", y.get_node("1AJX3s").to_json())
 
 #autocomplete gives the parent node of the id that needs to be autocompleted.
@@ -143,3 +161,5 @@ def create_new_node(sentence: str, autocomplete: Autocomplete, graph: Graph):
 # print(test_graph.to_json())
 # create_new_node(test_sentences[0], None, test_graph)
 # print(test_graph.to_json())
+
+print("> ", generate_emoji_from_sentence("Water turns into ice when you freeze it"))
