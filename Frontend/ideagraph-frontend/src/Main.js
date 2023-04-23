@@ -66,11 +66,12 @@ function Main() {
       text: "UCLA is a great public university.",
       // text : "John",
     };
-    const url = "http://127.0.0.1:8080/user_input";
+    const url = "http://localhost:8080/user_input";
     axios
-      .post(url, dummyData)
-      .then((response) => {
-        console.log(response.data);
+      .post(url, dummyData).then((response) => {
+        console.log(response.data.nodes);
+        setNodes(response.data.nodes);
+        setEdges(response.data.edges);
       })
       .catch((error) => {
         console.error(error);
@@ -98,6 +99,7 @@ function Main() {
     }
   }, []);
 
+
   useEffect(() => {
     const graph = new dagre.graphlib.Graph();
 
@@ -105,6 +107,7 @@ function Main() {
     graph.setGraph({ rankdir: "TB" });
 
     nodes.forEach((node) => {
+      console.log(node)
       graph.setNode(node.id, { width: 100, height: 100 });
     });
 
@@ -125,7 +128,7 @@ function Main() {
     console.log(nodes);
     setNodes(newNodes);
     console.log(newNodes);
-  }, []); // empty because we want to allow the user to move nodes around
+  }, [edges]); // empty because we want to allow the user to move nodes around
 
   const layout = {
     name: "dagre",
