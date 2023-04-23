@@ -176,6 +176,11 @@ def process_graph_object_from_file():
     graph.get_node(0).set_payload(summary.summary)
     return graph.to_json()
 
+@app.route("/reset_graph", methods = ['GET'])
+def reset_graph():
+    graph = Graph()
+    return graph.to_json()
+
 if __name__ == "__main__":
 	app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
 
