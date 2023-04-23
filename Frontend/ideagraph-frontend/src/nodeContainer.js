@@ -21,7 +21,7 @@ function nodeContainer({ data, isConnectable }) {
         <div class="container">
             
                 <img src="images/map@2x.png"></img>
-                <span class="titleText">Random Text</span>
+                <span class="titleText">{x.label}</span>
          
         </div>
 
@@ -29,8 +29,8 @@ function nodeContainer({ data, isConnectable }) {
             
             <p class="textMain">
 
-                The quick, brown fox jumps over a lazy dog. DJs flock by when MTV ax quiz prog. Junk MTV quiz graced by fox whelps.
-            
+              {x.payload}       
+                   
             </p>
         
         </div>

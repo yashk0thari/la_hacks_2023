@@ -19,7 +19,7 @@ graph = Graph()
 app = Flask(__name__)
 CORS(app, origins=['http://localhost:3000'])
 
-_path = "/Users/valley/Desktop/External_Finder/Hackathons/la_hacks_2023/Backend/uploads/"
+_path = _path = os.getcwd() +  "/uploads/"
 app.config['UPLOAD_FOLDER'] = _path  # Choose the folder where you want to save the uploaded files.
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # Set the maximum allowed file size to 16 MB.
 app.config['SECRET_KEY'] = 'your secret key'  # Set your secret key for flash messages.
