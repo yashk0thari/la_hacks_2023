@@ -24,7 +24,7 @@ app.config['UPLOAD_FOLDER'] = _path  # Choose the folder where you want to save 
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # Set the maximum allowed file size to 16 MB.
 app.config['SECRET_KEY'] = 'your secret key'  # Set your secret key for flash messages.
 
-ALLOWED_EXTENSIONS = {'txt', 'wav'}
+ALLOWED_EXTENSIONS = {'txt', 'wav', 'mp3'}
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -92,25 +92,31 @@ def process_autocomplete_data(id):
     }
 
 #audio input
-@app.route('/user_input/audio/', methods = ['POST'])
+@app.route('/user_input/audio/', methods = ['POST', 'GET'])
 def process_user_audio_input():
+    print(request.method)
     if request.method == 'POST':
+        print(request.files)
         if 'fileName' not in request.files:
-            return jsonify({"error": "No file part"}), 400
+            flash('No file part')
+            return redirect(request.url)
         file = request.files['fileName']
         if file.filename == '':
-            return jsonify({"error": "No selected file"}), 400
+            flash('No selected file')
+            return redirect(request.url)
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            if (".wav" in filename):
-                text = run_whisper(_path+"/"+ filename)
+            if (".wav" in filename or ".mp3" in filename):
+                text = run_whisper(_path + filename)
 
                 payload = {"text": text}
+            flash('File uploaded successfully.')
+            print(jsonify({"success": "File uploaded successfully 200."}))
 
-                requests.get(f"http://127.0.0.1:8080/graph_object_from_file/", params = payload)
+        response = requests.get(f"http://127.0.0.1:8080/graph_object_from_file/", params = payload)
+        return response.content
 
-            return jsonify({"success": "File uploaded successfully."}), 200
     return '''
     <!doctype html>
     <title>Upload File</title>
@@ -170,10 +176,10 @@ def process_graph_object_from_file():
             raise HTTPException(status_code=404, detail="Sentence cannot be null.")
         create_new_node(sentence, None, graph)
 
-    summary = co.summarize(text = ' '.join(text_sentences))
-    keyword = generate_keyword_from_sentence(summary.summary)
-    graph.get_node(0).set_keyword(keyword)
-    graph.get_node(0).set_payload(summary.summary)
+    # summary = co.summarize(text = ' '.join(text_sentences))
+    # keyword = generate_keyword_from_sentence(summary.summary)
+    # graph.get_node(0).set_keyword(keyword)
+    # graph.get_node(0).set_payload(summary.summary)
     return graph.to_json()
 
 @app.route("/reset_graph", methods = ['GET'])
