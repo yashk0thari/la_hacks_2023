@@ -142,5 +142,5 @@ def create_new_node(sentence: str, autocomplete: Autocomplete, graph: Graph):
 
 
 # print(test_graph.to_json())
-# create_new_node(test_sentences[0], test_graph)
+# create_new_node(test_sentences[0], None, test_graph)
 # print(test_graph.to_json())

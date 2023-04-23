@@ -1,5 +1,5 @@
 #import functions/classes
-from model import create_new_node
+from model import create_new_node, co, generate_keyword_from_sentence
 from pre_process import data_preprocess
 from structure import Graph, Node, Autocomplete
 from auto_complete import auto_complete, query_complete
@@ -169,6 +169,11 @@ def process_graph_object_from_file():
         if (sentence == ""):
             raise HTTPException(status_code=404, detail="Sentence cannot be null.")
         create_new_node(sentence, None, graph)
+
+    summary = co.summarize(text = ' '.join(text_sentences))
+    keyword = generate_keyword_from_sentence(summary.summary)
+    graph.get_node(0).set_keyword(keyword)
+    graph.get_node(0).set_payload(summary.summary)
     return graph.to_json()
 
 if __name__ == "__main__":

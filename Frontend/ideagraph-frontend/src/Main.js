@@ -96,16 +96,16 @@ function Main() {
       // text : "John",
     };
     const url = "http://localhost:8080/user_input";
-    axios
-      .post(url, dummyData)
-      .then((response) => {
-        console.log(response.data.nodes);
-        setNodes(response.data.nodes);
-        setEdges(response.data.edges);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    // axios
+    //   .post(url, dummyData)
+    //   .then((response) => {
+    //     console.log(response.data.nodes);
+    //     setNodes(response.data.nodes);
+    //     setEdges(response.data.edges);
+    //   })
+    //   .catch((error) => {
+    //     console.error(error);
+    //   });
   };
 
     //Action when an autocomplete request is made
@@ -276,7 +276,7 @@ function Main() {
               style={styles.sentenceDescription}
               sx={{ fontSize: "1rem" }}
             >
-              {payload[selectedNode]}
+              {payload[selectedNode][1]}
            </Typography>
           )}
         </>
@@ -386,7 +386,7 @@ function Main() {
                   axios
                     .post(endpoint, formData)
                     .then((response) => {
-                      console.log(response)
+                      // console.log(response.data.nodes_data)
                       setNodes(response.data.nodes);
                       setEdges(response.data.edges);
 
@@ -396,6 +396,7 @@ function Main() {
                         acc[key] = value;
                         return acc;
                       }, {});
+                      console.log(payloadObj)
                       setPayload(payloadObj);                           
                       // Do something with the response data
                     })
