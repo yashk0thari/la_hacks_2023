@@ -118,6 +118,6 @@ def create_new_node(sentence, graph: Graph):
     graph.create_node(new_node_id, sentence, keyword, [max_node_id],
     [],parent_node_depth + 1, 0, new_embedding, 0, 0)
 
-print(test_graph.to_json())
-create_new_node(test_sentences[0], test_graph)
-print(test_graph.to_json())
+# print(test_graph.to_json())
+# create_new_node(test_sentences[0], test_graph)
+# print(test_graph.to_json())

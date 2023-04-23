@@ -2,7 +2,7 @@ import os
 import openai
 
 # NOTE: Change Key Path to you Absolute Path
-openai.api_key_path = "/Users/valley/Desktop/External_Finder/Hackathons/la_hacks_2023/Backend/auto_complete_key.txt"
+openai.api_key = "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"
 
 def auto_complete(payload):
     auto_complete_prompt = "Exand on this thought as if it were a continuation of my thought: "
